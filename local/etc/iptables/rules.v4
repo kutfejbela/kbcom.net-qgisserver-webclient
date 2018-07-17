@@ -1,0 +1,120 @@
+*raw
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# SYNPROXY
+-A PREROUTING -p tcp -m tcp --syn -j CT --notrack
+
+COMMIT
+
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:block-privatesubnets-spoofed - [0:0]
+:block-bogus-tcp-flags - [0:0]
+
+# Comment out because of SYNPROXY
+#-A PREROUTING -m conntrack --ctstate INVALID -j DROP
+# Need ICMP ping test
+#-A PREROUTING -p icmp -j DROP
+-A PREROUTING -j block-privatesubnets-spoofed
+-A PREROUTING -p tcp ! --syn -m conntrack --ctstate NEW -j DROP
+-A PREROUTING -p tcp -m conntrack --ctstate NEW -m tcpmss ! --mss 536:65535 -j DROP
+-A PREROUTING -p tcp -j block-bogus-tcp-flags
+-A PREROUTING -f -j DROP
+
+-A block-privatesubnets-spoofed -s 127.0.0.0/8 -i lo -j RETURN
+# Intranet (172.16.0.0/16): input interface is "lo" because of SYNPROXY
+-A block-privatesubnets-spoofed -s 172.16.0.0/16 -i lo -j RETURN
+# Intranet (172.16.0.0/16)
+-A block-privatesubnets-spoofed -s 172.16.0.0/16 -i ens192 -j RETURN
+-A block-privatesubnets-spoofed -s 224.0.0.0/3 -j DROP
+-A block-privatesubnets-spoofed -s 169.254.0.0/16 -j DROP
+-A block-privatesubnets-spoofed -s 172.16.0.0/12 -j DROP
+-A block-privatesubnets-spoofed -s 192.0.2.0/24 -j DROP
+-A block-privatesubnets-spoofed -s 192.168.0.0/16 -j DROP
+-A block-privatesubnets-spoofed -s 10.0.0.0/8 -j DROP
+-A block-privatesubnets-spoofed -s 0.0.0.0/8 -j DROP
+-A block-privatesubnets-spoofed -s 240.0.0.0/5 -j DROP
+-A block-privatesubnets-spoofed -s 127.0.0.0/8 ! -i lo -j DROP
+
+-A block-bogus-tcp-flags -p tcp --tcp-flags SYN,ACK SYN,ACK -m conntrack --ctstate NEW -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags SYN,ACK SYN,ACK -m conntrack --ctstate NEW -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags FIN,SYN FIN,SYN -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags SYN,RST SYN,RST -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags FIN,RST FIN,RST -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags FIN,ACK FIN -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ACK,URG URG -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ACK,FIN FIN -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ACK,PSH PSH -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ALL ALL -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ALL NONE -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ALL FIN,PSH,URG -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ALL SYN,FIN,PSH,URG -j DROP
+-A block-bogus-tcp-flags -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
+
+COMMIT
+
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+COMMIT
+
+
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+:tcp-connections-limit - [0:0]
+:tcp-new-connections-limit - [0:0]
+:udp-connections-limit - [0:0]
+:icmp-connections-limit - [0:0]
+
+
+# SYNPROXY
+-A INPUT -p tcp -m tcp -m conntrack --ctstate INVALID,UNTRACKED -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
+# SYNPROXY and comment out mangle PREROUTING rule combination
+-A INPUT -m conntrack --ctstate INVALID -j DROP
+-A INPUT -p tcp -j tcp-connections-limit
+-A INPUT -p tcp -m conntrack --ctstate NEW -j tcp-new-connections-limit
+-A INPUT -p udp -j udp-connections-limit
+-A INPUT -p icmp -j icmp-connections-limit
+-A INPUT -j ACCEPT
+-A FORWARD -j DROP
+-A OUTPUT -m state --state INVALID -j DROP
+-A OUTPUT -j ACCEPT
+
+# TCP existing connection limit
+-A tcp-connections-limit -p tcp -m connlimit --connlimit-above 10 -j REJECT --reject-with tcp-reset
+-A tcp-connections-limit -p tcp --tcp-flags RST RST -m limit --limit 2/s --limit-burst 2 -j ACCEPT
+-A tcp-connections-limit -p tcp --tcp-flags RST RST -j DROP
+
+# TCP new connection limit
+-A tcp-new-connections-limit -p tcp -m conntrack --ctstate NEW -m limit --limit 20/s --limit-burst 20 -j ACCEPT
+-A tcp-new-connections-limit -p tcp -m conntrack --ctstate NEW -j DROP
+-A tcp-new-connections-limit -p tcp -m conntrack --ctstate NEW -m recent --set
+-A tcp-new-connections-limit -p tcp -m conntrack --ctstate NEW -m recent --update --seconds 20 --hitcount 10 -j DROP
+-A tcp-new-connections-limit -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --set
+-A tcp-new-connections-limit -p tcp --dport ssh -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 10 -j DROP
+
+# UDP package limit (huge impact to https if limit loopback DNS (127.0.0.1:53))
+-A udp-connections-limit -p udp -i lo --sport=53 -m limit --limit 40/s --limit-burst 50 -j RETURN
+-A udp-connections-limit -p udp -i lo --dport=53 -m limit --limit 40/s --limit-burst 50 -j RETURN
+-A udp-connections-limit -p udp -m limit --limit 50/s --limit-burst 5 -j RETURN
+-A udp-connections-limit -p udp -j DROP
+
+# ICMP package limit
+-A icmp-connections-limit -p icmp --icmp-type echo-request -m limit --limit 1/s --limit-burst 5 -j RETURN
+-A icmp-connections-limit -p icmp ! --icmp-type echo-request -m limit --limit 10/s --limit-burst 5 -j RETURN
+-A icmp-connections-limit -p icmp -j DROP
+
+COMMIT

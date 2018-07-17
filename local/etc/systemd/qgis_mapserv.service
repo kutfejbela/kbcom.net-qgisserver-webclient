@@ -1,0 +1,14 @@
+[Unit]
+Description=QGIS Map server service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=root
+Group=root
+StandardOutput=null
+StandardError=syslog
+ExecStart=/usr/bin/spawn-fcgi -U www-data -G www-data -s /run/qgis_mapserv.sock -n -- /usr/lib/cgi-bin/qgis_mapserv.fcgi
+
+[Install]
+WantedBy=multi-user.target
