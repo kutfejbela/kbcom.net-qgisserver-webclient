@@ -10,12 +10,12 @@ echo "<div id='container' style='position: absolute; top: 0; bottom: 0; left: 0;
 let "GLOBAL_WMS_MAPIMAGECONTAINER_WIDTH=$CONFIG_WMS_MAPIMAGE_WIDTH + 150"
 let "GLOBAL_WMS_MAPIMAGECONTAINER_HEIGHT=$CONFIG_WMS_MAPIMAGE_HEIGHT + 10"
 
-source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-wmsclient-showpopups.bash"
+source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showpopups.bash"
 
 echo "<table style='margin: auto; border: 0;'>"
 echo "<tr>"
 echo " <td style='border: 0;'>"
-source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-wmsclient-showsearch.bash"
+source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showsearch.bash"
 echo " </td>"
 echo "</tr>"
 echo "<tr>"
