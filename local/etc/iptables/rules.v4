@@ -9,15 +9,15 @@ COMMIT
 
 
 *mangle
-:PREROUTING ACCEPT [0:0]
-:INPUT ACCEPT [0:0]
+:PREROUTING DROP [0:0]
+:INPUT DROP [0:0]
 :FORWARD DROP [0:0]
-:OUTPUT ACCEPT [0:0]
-:POSTROUTING ACCEPT [0:0]
+:OUTPUT DROP [0:0]
+:POSTROUTING DROP [0:0]
 :block-privatesubnets-spoofed - [0:0]
 :block-bogus-tcp-flags - [0:0]
 
-# Comment out because of SYNPROXY
+# Commented out because of SYNPROXY
 #-A PREROUTING -m conntrack --ctstate INVALID -j DROP
 # Need ICMP ping test
 #-A PREROUTING -p icmp -j DROP
@@ -26,6 +26,12 @@ COMMIT
 -A PREROUTING -p tcp -m conntrack --ctstate NEW -m tcpmss ! --mss 536:65535 -j DROP
 -A PREROUTING -p tcp -j block-bogus-tcp-flags
 -A PREROUTING -f -j DROP
+-A PREROUTING -j ACCEPT
+-A INPUT -j ACCEPT
+-A FORWARD -j DROP
+-A OUTPUT -j ACCEPT
+-A POSTROUTING -j ACCEPT
+
 
 -A block-privatesubnets-spoofed -s 127.0.0.0/8 -i lo -j RETURN
 # Intranet (172.16.0.0/16): input interface is "lo" because of SYNPROXY
@@ -73,7 +79,7 @@ COMMIT
 *filter
 :INPUT DROP [0:0]
 :FORWARD DROP [0:0]
-:OUTPUT ACCEPT [0:0]
+:OUTPUT DROP [0:0]
 :tcp-connections-limit - [0:0]
 :tcp-new-connections-limit - [0:0]
 :udp-connections-limit - [0:0]
@@ -82,7 +88,7 @@ COMMIT
 
 # SYNPROXY
 -A INPUT -p tcp -m tcp -m conntrack --ctstate INVALID,UNTRACKED -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
-# SYNPROXY and comment out mangle PREROUTING rule combination
+# SYNPROXY and commented out mangle:PREROUTING rule combination
 -A INPUT -m conntrack --ctstate INVALID -j DROP
 -A INPUT -p tcp -j tcp-connections-limit
 -A INPUT -p tcp -m conntrack --ctstate NEW -j tcp-new-connections-limit

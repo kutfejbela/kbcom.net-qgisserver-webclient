@@ -4,5 +4,6 @@
 :OUTPUT DROP [0:0]
 
 -A INPUT -i lo -s ::1 -j ACCEPT
+-A FORWARD -j DROP
 -A OUTPUT -o lo -d ::1 -j ACCEPT
 COMMIT
