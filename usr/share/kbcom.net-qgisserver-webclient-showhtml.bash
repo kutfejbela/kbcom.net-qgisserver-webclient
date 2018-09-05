@@ -6,16 +6,16 @@ echo "<td style='border: 0;'>"
 
 for (( GLOBAL_HTML_INDEX=0; GLOBAL_HTML_INDEX<=CONFIG_HTML_COUNT; GLOBAL_HTML_INDEX++ ))
 do
+  echo
+  echo "<!-- HTML index: $GLOBAL_HTML_INDEX -->"
+  echo
+
  if [ "${CONFIG_HTML_ISSTATIC[$GLOBAL_HTML_INDEX]}" = true ]
  then
   echo -e "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}"
  else
   IFS=$'\n'
   GLOBAL_HTML_DATA=$(eval "${CONFIG_HTML_EXECUTE[$GLOBAL_HTML_INDEX]}")
-
-  echo
-  echo "<!-- HTML index: $GLOBAL_HTML_INDEX -->"
-  echo
 
   if [ -z "$GLOBAL_HTML_DATA" ]
   then
