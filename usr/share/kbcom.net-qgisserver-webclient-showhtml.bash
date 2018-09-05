@@ -19,14 +19,17 @@ do
   else
    echo -e "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_header]}"
 
-   for GLOBAL_STRINGDATAROW in $GLOBAL_HTML_DATA
-   do
-    declare -a GLOBAL_STRINGDATAROW_ARRAY
-    convert_arraydatarow_stringdatarow "$GLOBAL_STRINGDATAROW"
+   if [ -z ${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}]
+   then
+    for GLOBAL_STRINGDATAROW in $GLOBAL_HTML_DATA
+    do
+     declare -a GLOBAL_STRINGDATAROW_ARRAY
+     convert_arraydatarow_stringdatarow "$GLOBAL_STRINGDATAROW"
 
-    IFS=''
-    echo -e "$(convert_stringhtml_stringtemplate ${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]})"
-   done
+     IFS=''
+     echo -e "$(convert_stringhtml_stringtemplate ${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]})"
+    done
+   fi
 
    echo -e "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_footer]}"
   fi
