@@ -13,6 +13,10 @@ do
   IFS=$'\n'
   GLOBAL_HTML_DATA=$(eval "${CONFIG_HTML_EXECUTE[$GLOBAL_HTML_INDEX]}")
 
+  echo
+  echo "<!-- HTML index: $GLOBAL_HTML_INDEX -->"
+  echo
+
   if [ -z "$GLOBAL_HTML_DATA" ]
   then
    echo -e "${CONFIG_HTML_EMPTY[$GLOBAL_HTML_INDEX]}"
