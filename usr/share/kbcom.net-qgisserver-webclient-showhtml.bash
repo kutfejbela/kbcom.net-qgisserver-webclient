@@ -4,10 +4,14 @@ echo "<table style='margin: auto; border: 0;'>"
 echo "<tr style='border: 0;'>"
 echo "<td style='border: 0;'>"
 
+echo
+echo "<!-- HTML template processing has started -->"
+echo
+
 for (( GLOBAL_HTML_INDEX=0; GLOBAL_HTML_INDEX<=CONFIG_HTML_COUNT; GLOBAL_HTML_INDEX++ ))
 do
   echo
-  echo "<!-- HTML index: $GLOBAL_HTML_INDEX -->"
+  echo "<!-- HTML template index: $GLOBAL_HTML_INDEX -->"
   echo
 
  if [ "${CONFIG_HTML_ISSTATIC[$GLOBAL_HTML_INDEX]}" = true ]
@@ -39,6 +43,10 @@ do
   fi
  fi
 done
+
+echo
+echo "<!-- HTML template processing finished -->"
+echo
 
 echo "</td>"
 echo "</tr>"
