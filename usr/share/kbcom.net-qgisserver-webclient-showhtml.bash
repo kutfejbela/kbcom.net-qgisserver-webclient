@@ -19,7 +19,7 @@ do
   else
    echo -e "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_header]}"
 
-   if [ -z ${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}]
+   if [ ! -z "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}" ]
    then
     for GLOBAL_STRINGDATAROW in $GLOBAL_HTML_DATA
     do
