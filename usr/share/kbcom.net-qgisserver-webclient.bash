@@ -3,7 +3,7 @@
 GLOBAL_FOLDER_SCRIPT=$(/usr/bin/dirname "$0")
 source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient.bash"
 
-source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient-html.conf
+#source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient-html.conf
 source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient.conf
 
 
@@ -33,7 +33,7 @@ showhtml)
  show_header_html "
 <meta http-equiv="refresh" content="${CONFIG_HTML_REFRESHINTERVAL}">
 <style>
-${CONFIG_HTML_STYLE}
+${CONFIG_HTML_CSS}
 </style>"
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showhtml.bash"
  show_footer_html

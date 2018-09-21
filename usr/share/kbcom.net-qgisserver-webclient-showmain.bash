@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "<style>
-$CONFIG_SEARCH_STYLE
+$CONFIG_SEARCH_CSS
 iframe.hidden { position: absolute; display: none; visibility: hidden; width: 0; height: 0; margin: 0; padding: 0; border: 0; background-color: transparent; }
 </style>"
 

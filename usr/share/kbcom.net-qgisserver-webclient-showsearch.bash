@@ -1,13 +1,12 @@
 #!/bin/bash
 
-echo "<span class='search-label'>${CONFIG_SEARCH_LABEL}</span>
- <input tabindex='0' type='text' id='search_searchbox' placeholder='${CONFIG_SEARCH_PLACEHOLDER}' class='search-searchbox' onkeyup='search_searchbox_onkeyup(event);'>
- <button class='search-button' onclick='search_button_onclick();'>$CONFIG_SEARCH_BUTTONTEXT</button><br>
- <span class='search-help'>${CONFIG_SEARCH_HELP}</span>"
+#echo "<label class='search-label'>${CONFIG_SEARCH_LABEL}</label>
+echo " <input tabindex='0' type='text' id='search_searchbox' placeholder='${CONFIG_SEARCH_LABEL}' class='search-searchbox' onkeyup='search_searchbox_onkeyup(event);'><br>
+ <label class='search-help'>${CONFIG_SEARCH_HELP}</label>"
 
 echo "<script>
 
- function search_button_onclick()
+ function search_searchbox_onkeyup(event)
  {
   var search_rect=document.getElementById('search_searchbox').getBoundingClientRect();
   var search_text=document.getElementById('search_searchbox').value.trim();
@@ -31,11 +30,6 @@ echo "<script>
   }
 
   document.getElementById('searchresult_container').src='${GLOBAL_URL}?type=searchresult&searchtext=' + search_text;
- }
-
- function search_searchbox_onkeyup(event)
- {
-  search_button_onclick();
  }
 
 </script>"
