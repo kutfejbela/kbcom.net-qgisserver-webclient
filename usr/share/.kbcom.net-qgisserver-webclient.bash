@@ -365,8 +365,6 @@ convert_stringhtml_stringtemplate()
 
 show_header_html()
 {
- local LOCAL_SHELL_HEAD="$1"
-
  echo "Content-type: text/html;charset=UTF-8"
  echo
 
@@ -374,7 +372,6 @@ show_header_html()
  echo "<html>"
  echo "<head>"
  echo " <title>${CONFIG_MAIN_TITLE}</title>"
- echo " ${LOCAL_SHELL_HEAD}"
  echo "</head>"
  echo "<body tabindex='-1' style='margin: 0; padding: 0; border: 0;'>"
 }
