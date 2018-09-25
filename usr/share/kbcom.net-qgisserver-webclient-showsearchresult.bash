@@ -41,7 +41,7 @@ do
 
  if [ $GLOBAL_SEARCHRESULT_ITEMCOUNTER -gt $CONFIG_SEARCHRESULT_MAXIMUMITEMNUMBER ]
  then
-  echo "<span class='searchresult-maximumitem'>$CONFIG_SEARCHRESULT_MAXIMUMITEMTEXT</span>"
+  echo "<span class='searchresult-maximumitem'>$CONFIG_SEARCHRESULT_MORETHANMAXIMUMITEMTEXT</span>"
   break
  fi
 
@@ -54,3 +54,8 @@ do
  echo -e "${GLOBAL_SQL_RESULTROW:GLOBAL_SQL_RESULTROWDELIMITER}"
  echo "</span><br>"
 done
+
+if [ "$GLOBAL_SEARCHRESULT_ITEMCOUNTER" -eq "0" ]
+then
+  echo "<span class='searchresult-maximumitem'>$CONFIG_SEARCHRESULT_NONETEXT</span>"
+fi
