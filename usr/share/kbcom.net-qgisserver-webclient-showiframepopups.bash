@@ -10,8 +10,8 @@ echo "
  iframe.popuphidden2 { z-index: 2; position: absolute; visibility: hidden; top: 0; left:0; width: 0; height: 0; margin: 0; padding: 0; border: 0; background-color: transparent; }
 </style>
 
-<iframe id='iframe_maptip' class='popuphidden1' onload='iframe_maptip_onload();'></iframe>
 <iframe id='iframe_searchresult' class='popuphidden2' onload='iframe_searchresult_onload();'></iframe>
+<iframe id='iframe_maptip' class='popuphidden1' onload='iframe_maptip_onload();'></iframe>
 "
 
 ### Hide Pop-up IFRAMEs ###
@@ -21,7 +21,7 @@ echo "
 
 <script>
 
-function hide_popupiframes()
+function popupiframes_hide()
 {
  document.getElementById('iframe_maptip').style.width = 0;
  document.getElementById('iframe_maptip').style.height = 0;
@@ -34,6 +34,60 @@ function hide_popupiframes()
 </script>
 "
 
+### SEARCHRESULT setposition & onload ###
+
+echo "
+<!-- SEARCHRESULT hide, setposition & onload -->
+
+<script>
+
+function iframe_searchresult_hide()
+{
+ document.getElementById('iframe_searchresult').style.width = 0;
+ document.getElementById('iframe_searchresult').style.height = 0;
+ document.getElementById('iframe_searchresult').style.visibility = 'hidden';
+}
+
+function iframe_searchresult_setposition(parameter_x, parameter_y)
+{
+ document.getElementById('iframe_searchresult').style.left = parameter_x;
+ document.getElementById('iframe_searchresult').style.top = parameter_y;
+}
+
+function iframe_searchresult_setsrc(parameter_searchtext)
+{
+
+}
+
+function iframe_searchresult_onload()
+{
+ var local_iframe_searchresult_calculatedwidth = document.getElementById('iframe_searchresult').contentWindow.document.body.scrollWidth;
+ var local_iframe_searchresult_calculatedheight = document.getElementById('iframe_searchresult').contentWindow.document.body.scrollHeight;
+
+ if ( local_iframe_searchresult_calculatedwidth <= $CONFIG_SEARCHRESULT_MINIMUMWIDTH )
+ {
+  document.getElementById('iframe_searchresult').style.width = $CONFIG_SEARCHRESULT_MINIMUMWIDTH;
+ }
+ else
+ {
+  document.getElementById('iframe_searchresult').style.width = local_iframe_searchresult_calculatedwidth;
+ }
+
+ if ( $CONFIG_SEARCHRESULT_MAXIMUMHEIGHT <= local_iframe_searchresult_calculatedheight )
+ {
+  document.getElementById('iframe_searchresult').style.height = $CONFIG_SEARCHRESULT_MAXIMUMHEIGHT;
+ }
+ else
+ {
+  document.getElementById('iframe_searchresult').style.height = local_iframe_searchresult_calculatedheight;
+ }
+
+ document.getElementById('iframe_searchresult').style.visibility = 'visible';
+}
+
+</script>
+"
+
 ### MAPTIP setposition & onload  ###
 
 echo "
@@ -41,50 +95,17 @@ echo "
 
 <script>
 
-var iframe_maptip_top = 0;
-var iframe_maptip_left = 0;
-
-function iframe_maptip_setposition(x, y)
+function iframe_maptip_setposition(parameter_x, parameter_y)
 {
- iframe_maptip_top = document.getElementById('iframe_map').getBoundingClientRect().top + y;
- iframe_maptip_left = document.getElementById('iframe_map').getBoundingClientRect().left + x;
+ document.getElementById('iframe_maptip').style.left = parameter_x;
+ document.getElementById('iframe_maptip').style.top = parameter_y;
 }
 
 function iframe_maptip_onload()
 {
- document.getElementById('iframe_maptip').style.top = iframe_maptip_top;
- document.getElementById('iframe_maptip').style.left = iframe_maptip_left;
- document.getElementById('iframe_maptip').style.width = document.getElementById('map_maptip').contentWindow.document.body.scrollWidth;
- document.getElementById('iframe_maptip').style.height = document.getElementById('map_maptip').contentWindow.document.body.scrollHeight;
+ document.getElementById('iframe_maptip').style.width = document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
+ document.getElementById('iframe_maptip').style.height = document.getElementById('iframe_maptip').contentWindow.document.body.scrollHeight;
  document.getElementById('iframe_maptip').style.visibility = 'visible';
-}
-
-</script>
-
-<script>
-
-searchresult_container_onload_enabled=false;
-
-function searchresult_container_onload()
-{
- if ( ! searchresult_container_onload_enabled )
- {
-  return false;
- }
-
- var iframe_searchresult_calculatedheight = document.getElementById('searchresult_container').contentWindow.document.body.scrollWidth;
-
- if ( iframe_searchresult_calculatedheight <= $CONFIG_SEARCHRESULT_MINIMUMWIDTH )
- {
-  document.getElementById('iframe_searchresult').style.width = $CONFIG_SEARCHRESULT_MINIMUMWIDTH;
- }
- else
- {
-  document.getElementById('iframe_searchresult').style.width = iframe_searchresult_calculatedheight;
- }
-
- document.getElementById('iframe_searchresult').style.height = document.getElementById('iframe_searchresult').contentWindow.document.body.scrollHeight;
- document.getElementById('iframe_searchresult').style.visibility = 'visible';
 }
 
 </script>

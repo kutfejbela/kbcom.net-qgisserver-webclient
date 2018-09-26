@@ -12,9 +12,7 @@ SHELL_GET_TYPE=$(shell_get_value type)
 
 case "$SHELL_GET_TYPE" in
 showsearch)
- show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showsearch.bash"
- show_footer_html
  ;;
 searchresult)
  show_header_html
@@ -22,7 +20,9 @@ searchresult)
  show_footer_html
  ;;
 wmsimage)
+ show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmapimg.bash"
+ show_footer_html
  ;;
 wmsmaptip)
  show_header_html

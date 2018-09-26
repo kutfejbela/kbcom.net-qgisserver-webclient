@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "<style>
+$CONFIG_CSS_HTML
+</style>"
+
 echo "<table style='margin: auto; border: 0;'>"
 echo "<tr style='border: 0;'>"
 echo "<td style='border: 0;'>"

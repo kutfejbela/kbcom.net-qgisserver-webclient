@@ -21,16 +21,16 @@ echo "
 
 <script>
 
-var iframe_search_sized = false;
+var global_iframe_search_sized = false;
 
 function iframe_search_onload()
 {
- if (iframe_search_sized)
+ if (global_iframe_search_sized)
  {
   return;
  }"
 
-if [ -z "$CONFIG_MAIN_SEARCHSIZE" ] || [ "$CONFIG_MAIN_SEARCHSIZE" -eq "0" ]
+if [ "$CONFIG_MAIN_SEARCHSIZE" -eq "0" ]
 then
  echo "
  document.getElementById('iframe_search').style.height = document.getElementById('iframe_search').contentWindow.document.body.scrollHeight;"
@@ -40,7 +40,7 @@ else
 fi
 
 echo "
- iframe_search_sized = true;
+ global_iframe_search_sized = true;
 
  document.getElementById('iframe_map').style.top = document.getElementById('iframe_search').getBoundingClientRect().bottom;
  iframe_html_setpositionandsize();
@@ -59,16 +59,16 @@ echo "
 
 <script>
 
-var iframe_map_sized = false;
+var global_iframe_map_sized = false;
 
 function iframe_map_onload()
 {
- if (iframe_map_sized)
+ if (global_iframe_map_sized)
  {
   return;
  }"
 
-if [ -z "$CONFIG_MAIN_MAPSIZE" ] || [ "$CONFIG_MAIN_MAPSIZE" -eq "0" ]
+if [ "$CONFIG_MAIN_MAPSIZE" -eq "0" ]
 then
  echo "
  document.getElementById('iframe_map').style.height = document.getElementById('iframe_map').contentWindow.document.body.scrollHeight;"
@@ -78,7 +78,7 @@ else
 fi
 
 echo "
- iframe_map_sized = true;
+ global_iframe_map_sized = true;
 
  iframe_html_setpositionandsize();
 
@@ -95,52 +95,52 @@ echo "
 
 <script>
 
-var iframe_html_loaded = false;
+var global_iframe_html_loaded = false;
 
 function iframe_html_onload()
 {
- if (iframe_html_loaded)
+ if (global_iframe_html_loaded)
  {
   return;
  }
 
- iframe_html_loaded = true;
+ global_iframe_html_loaded = true;
  iframe_html_setpositionandsize();
 }
 
 function iframe_html_setpositionandsize()
 {
- if (!iframe_html_loaded)
+ if (!global_iframe_html_loaded)
  {
   return;
  }"
 
-if [ -z "$CONFIG_MAIN_HTMLSIZE" ] || [ "$CONFIG_MAIN_HTMLSIZE" -eq "0" ]
+if [ "$CONFIG_MAIN_HTMLSIZE" -eq "0" ]
 then
- if [ -z "$CONFIG_MAIN_HTMLMINIMUMSIZE" ] || [ "$CONFIG_MAIN_HTMLMINIMUMSIZE" -eq "0" ]
+ if [ "$CONFIG_MAIN_HTMLMINIMUMSIZE" -eq "0" ]
  then
   echo "
  document.getElementById('iframe_html').style.height = document.getElementById('iframe_html').contentWindow.document.body.scrollHeight;"
  else
   echo "
- if (!iframe_search_sized)
+ if (!global_iframe_search_sized)
  {
   return;
  }
 
- if (!iframe_map_sized)
+ if (!global_iframe_map_sized)
  {
   return;
  }
 
- var iframe_map_rect = document.getElementById('iframe_map').getBoundingClientRect();
- var iframe_html_calculatedheight = document.getElementById('div_container').getBoundingClientRect().bottom - iframe_map_rect.bottom;
+ var local_iframe_map_rect = document.getElementById('iframe_map').getBoundingClientRect();
+ var local_iframe_html_calculatedheight = document.getElementById('div_container').getBoundingClientRect().bottom - local_iframe_map_rect.bottom;
 
- document.getElementById('iframe_html').style.top = iframe_map_rect.bottom;
+ document.getElementById('iframe_html').style.top = local_iframe_map_rect.bottom;
 
- if ( ${CONFIG_MAIN_HTMLMINIMUMSIZE} < iframe_html_calculatedheight )
+ if ( ${CONFIG_MAIN_HTMLMINIMUMSIZE} < local_iframe_html_calculatedheight )
  {
-  document.getElementById('iframe_html').style.height = iframe_html_calculatedheight;
+  document.getElementById('iframe_html').style.height = local_iframe_html_calculatedheight;
  }
  else
  {

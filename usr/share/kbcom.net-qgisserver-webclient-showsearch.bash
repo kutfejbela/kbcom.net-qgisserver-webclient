@@ -1,35 +1,58 @@
 #!/bin/bash
 
-#echo "<label class='search-label'>${CONFIG_SEARCH_LABEL}</label>
-echo " <input tabindex='0' type='text' id='search_searchbox' placeholder='${CONFIG_SEARCH_LABEL}' class='search-searchbox' onkeyup='search_searchbox_onkeyup(event);'><br>
- <label class='search-help'>${CONFIG_SEARCH_HELP}</label>"
+### SEARCH head & style classes ###
 
-echo "<script>
+echo "
+<!-- SEARCH head & style classes -->
+<html>
+<head>
+<title>Search</title>
+<style>
+$CONFIG_CSS_SEARCH
+</style>
+<meta charset='UTF-8'>
+</head>
+<body tabindex='-1'>
+"
 
- function search_searchbox_onkeyup(event)
- {
-  var search_rect=document.getElementById('search_searchbox').getBoundingClientRect();
-  var search_text=document.getElementById('search_searchbox').value.trim();
-  var search_length=search_text.length;
+### SEARCH inputbox & help ###
 
-  searchresult_container_onload_enabled=true;
-  document.getElementById('searchresult_container').style.width=0;
-  document.getElementById('searchresult_container').style.height=0;
-  document.getElementById('searchresult_container').style.left=search_rect.left;
-  document.getElementById('searchresult_container').style.top=search_rect.bottom;
-  document.getElementById('searchresult_container').style.visibility='hidden';
+echo "
+<!-- SEARCH inputbox & help -->
 
-  if (search_length < 4)
+<input tabindex='0' type='text' id='search_inputbox' placeholder='${CONFIG_SEARCH_LABEL}' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);'><br>
+<label class='search-help'>${CONFIG_SEARCH_HELP}</label>
+"
+
+### SEARCH inputbox onkeyup & onfocus ###
+
+echo "
+<!-- SEARCH inputbox onkeyup & onfocus -->
+
+<script>
+
+function search_inputbox_onkeyup(event)
+{
+  var local_search_inputbox_rect = document.getElementById('search_inputbox').getBoundingClientRect();
+  var local_search_inputbox_text = document.getElementById('search_inputbox').value.trim();
+  var local_search_inputbox_textlength = local_search_inputbox_text.length;
+
+  parent.iframe_searchresult_hide();
+
+  if ( local_search_inputbox_textlength < 4 )
   {
    return;
   }
 
-  if (30 < search_length)
+  if ( 30 < local_search_inputbox_textlength )
   {
+   document.getElementById('search_inputbox').value = local_search_inputbox_text.substring(0, 30);
    return;
   }
 
-  document.getElementById('searchresult_container').src='${GLOBAL_URL}?type=searchresult&searchtext=' + search_text;
+  parent.iframe_searchresult_setposition(local_search_inputbox_rect.left, local_search_inputbox_rect.bottom);
+  parent.iframe_searchresult_setsrc(local_search_inputbox_text);
+//  parent.document.getElementById('iframe_searchresult').src='${GLOBAL_URL}?type=searchresult&searchtext=' + search_inputbox_text;
  }
 
 </script>"
