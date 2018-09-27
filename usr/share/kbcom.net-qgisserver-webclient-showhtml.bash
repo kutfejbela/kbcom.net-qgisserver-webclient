@@ -1,8 +1,19 @@
 #!/bin/bash
 
-echo "<style>
+### HTML head & style classes ###
+
+echo "
+<!-- HTML head & style classes -->
+<html>
+<head>
+<title>$CONFIG_MAIN_TITLE - HTML</title>
+<style>
 $CONFIG_CSS_HTML
-</style>"
+</style>
+<meta charset='UTF-8'>
+</head>
+<body tabindex='-1'>
+"
 
 echo "<table style='margin: auto; border: 0;'>"
 echo "<tr style='border: 0;'>"

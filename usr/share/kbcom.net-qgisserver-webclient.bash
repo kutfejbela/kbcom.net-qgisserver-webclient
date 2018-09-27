@@ -20,9 +20,7 @@ searchresult)
  show_footer_html
  ;;
 wmsimage)
- show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmapimg.bash"
- show_footer_html
  ;;
 wmsmaptip)
  show_header_html

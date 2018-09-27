@@ -163,8 +163,7 @@ download_image_wms()
  QUERY_STRING+="&height=$CONFIG_WMS_MAPIMAGE_HEIGHT"
  QUERY_STRING+="&format=$CONFIG_WMS_MAPIMAGE_FORMAT"
 
-echo "$QUERY_STRING"
-echo" /usr/bin/cgi-fcgi -bind -connect $CONFIG_WMS_SOCKET_QGISSERVER"
+ /usr/bin/cgi-fcgi -bind -connect $CONFIG_WMS_SOCKET_QGISSERVER
 }
 
 download_info_wms()

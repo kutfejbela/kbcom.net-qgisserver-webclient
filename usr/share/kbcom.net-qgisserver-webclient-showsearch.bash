@@ -6,7 +6,7 @@ echo "
 <!-- SEARCH head & style classes -->
 <html>
 <head>
-<title>Search</title>
+<title>$CONFIG_MAIN_TITLE - Search</title>
 <style>
 $CONFIG_CSS_SEARCH
 </style>
@@ -20,7 +20,7 @@ $CONFIG_CSS_SEARCH
 echo "
 <!-- SEARCH inputbox & help -->
 
-<input tabindex='0' type='text' id='search_inputbox' placeholder='${CONFIG_SEARCH_LABEL}' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);'><br>
+<input tabindex='0' type='text' id='search_inputbox' placeholder='${CONFIG_SEARCH_LABEL}' maxlength='30' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);'><br>
 <label class='search-help'>${CONFIG_SEARCH_HELP}</label>
 "
 
