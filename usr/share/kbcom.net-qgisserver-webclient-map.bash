@@ -1,5 +1,22 @@
 #!/bin/bash
 
+### MAP head & style classes ###
+
+echo "
+<!-- MAP head & style classes -->
+<html>
+<head>
+<title>$CONFIG_MAIN_TITLE - Map</title>
+<style>
+$CONFIG_MAP_CSS
+</style>
+<meta charset='UTF-8'>
+</head>
+<body tabindex='-1'>
+"
+
+### HTML GET id & gid ###
+
 SHELL_GET_ID=$(shell_get_value "id")
 SHELL_GET_GID=$(shell_get_value "gid")
 GLOBAL_STRING_GEOMARRAY=""
@@ -31,38 +48,35 @@ fi
 
 if [ -z "$SHELL_GET_ID" ]
 then
- GLOBAL_CENTERX="$CONFIG_WMS_BBOX_DEFAULTCENTERX"
- GLOBAL_CENTERY="$CONFIG_WMS_BBOX_DEFAULTCENTERY"
- GLOBAL_ZOOMLEVEL="$CONFIG_WMS_ZOOMLEVEL_DEFAULT"
+ GLOBAL_CENTERX="$CONFIG_WMS_DEFAULTCENTERX"
+ GLOBAL_CENTERY="$CONFIG_WMS_DEFAULTCENTERY"
+ GLOBAL_ZOOMLEVEL="$CONFIG_WMS_ZOOMLEVELDEFAULT"
 fi
 
+### HTML ###
 
-echo "<img id='wms_mapimg' draggable='false' width='${CONFIG_WMS_MAPIMAGE_WIDTH}' height='${CONFIG_WMS_MAPIMAGE_HEIGHT}' style='margin: 0; padding: 0; float: left; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;' ondragstart='return false;' onwheel='wms_mapimg_onwheel(this, event); return false;' onmousedown='wms_mapimg_onmousedown(this, event);' onmouseup='wms_mapimg_onmouseup(this, event);' onmouseleave='wms_mapimg_onmouseleave(this, event);' onload='wms_mapimg_onload();'><br>"
+#${CONFIG_WMS_MAPIMAGEWIDTH}
+echo "<img tabindex='0' id='wms_mapimage' draggable='false' width='100%' height='${CONFIG_WMS_MAPIMAGEHEIGHT}' style='margin: 0; padding: 0; float: left; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;' ondragstart='return false;' onwheel='wms_mapimage_onwheel(this, event); return false;' onmousedown='wms_mapimage_onmousedown(this, event);' onmouseup='wms_mapimage_onmouseup(this, event);' onmouseleave='wms_mapimage_onmouseleave(this, event);' onload='wms_mapimage_onload();'><br>"
 
-echo "<input id='button_wms_zoomin' type='button' value=' + ' onclick='wms_zoomin();'><br>"
-echo "<input id='button_wms_zoomout' type='button' value=' - ' onclick='wms_zoomout();'><br>"
-
-echo "<input id='button_wms_moveup' type='button' value=' ^ ' onclick='wms_movedown();'>"
-echo "<input id='button_wms_movedown' type='button' value=' v ' onclick='wms_moveup();'><br>"
-echo "<input id='button_wms_moveleft' type='button' value=' < ' onclick='wms_moveleft();'>"
-echo "<input id='button_wms_moveright' type='button' value=' > ' onclick='wms_moveright();'>"
-
-echo "<textarea id='wms_mapimgurl' style='width: 100px; height: 200px;'></textarea>"
+echo "<span class='map-help'>$CONFIG_MAP_HELPHTML</span>"
+echo "<span class='map-legend'>$CONFIG_MAP_LEGENDHTML</span>"
 
 echo "<script>
-document.getElementById('wms_mapimg').addEventListener('wheel', function(){
- wms_mapimg_onwheel(this, event);
+alert(document.getElementById('wms_mapimage').width)
+
+document.getElementById('wms_mapimage').addEventListener('wheel', function(){
+ wms_mapimage_onwheel(this, event);
  event.preventDefault();
 });
 
-var global_minx=$CONFIG_WMS_BBOX_MINX;
-var global_maxx=$CONFIG_WMS_BBOX_MAXX;
-var global_miny=$CONFIG_WMS_BBOX_MINY;
-var global_maxy=$CONFIG_WMS_BBOX_MAXY;
+var global_minx=$CONFIG_WMS_MINX;
+var global_maxx=$CONFIG_WMS_MAXX;
+var global_miny=$CONFIG_WMS_MINY;
+var global_maxy=$CONFIG_WMS_MAXY;
 
 var global_width=global_maxx-global_minx;
 var global_height=global_maxy-global_miny;
-var global_zoomlevel_stepsquare=Math.pow($CONFIG_WMS_ZOOMLEVEL_STEP, 2);
+var global_zoomlevel_stepsquare=Math.pow($CONFIG_WMS_ZOOMLEVELSTEP, 2);
 
 var global_move_percentage=$CONFIG_WMS_MOVEPERCENTAGE/100;
 var global_movex=0
@@ -76,8 +90,8 @@ var global_centery_max=0;
 var global_centerx=$GLOBAL_CENTERX;
 var global_centery=$GLOBAL_CENTERY;
 var global_zoomlevel=$GLOBAL_ZOOMLEVEL;
-var global_zoomlevel_min=$CONFIG_WMS_ZOOMLEVEL_MIN;
-var global_zoomlevel_max=$CONFIG_WMS_ZOOMLEVEL_MAX;
+var global_zoomlevel_min=$CONFIG_WMS_ZOOMLEVELMIN;
+var global_zoomlevel_max=$CONFIG_WMS_ZOOMLEVELMAX;
 
 var global_zoom_widthrate=0;
 var global_zoom_heightrate=0;
@@ -100,64 +114,64 @@ function wms_showmap()
 
  if ( global_zoomlevel_max <= global_zoomlevel )
  {
-  document.getElementById('button_wms_zoomin').disabled=1;
+//  document.getElementById('button_wms_zoomin').disabled=1;
   global_zoomlevel=global_zoomlevel_max;
  }
  else
  {
-  document.getElementById('button_wms_zoomin').disabled=0;
+//  document.getElementById('button_wms_zoomin').disabled=0;
  }
 
  if ( global_zoomlevel <= global_zoomlevel_min )
  {
-  document.getElementById('button_wms_zoomout').disabled=1;
+//  document.getElementById('button_wms_zoomout').disabled=1;
   global_zoomlevel=global_zoomlevel_min;
  }
  else
  {
-  document.getElementById('button_wms_zoomout').disabled=0;
+//  document.getElementById('button_wms_zoomout').disabled=0;
  }
 
  if ( global_zoom_centerx <= global_centerx_min )
  {
-  document.getElementById('button_wms_moveleft').disabled=1;
+//  document.getElementById('button_wms_moveleft').disabled=1;
  }
  else
  {
-  document.getElementById('button_wms_moveleft').disabled=0;
+//  document.getElementById('button_wms_moveleft').disabled=0;
  }
 
  if ( global_centerx_max <= global_zoom_centerx )
  {
-  document.getElementById('button_wms_moveright').disabled=1;
+//  document.getElementById('button_wms_moveright').disabled=1;
   global_zoom_centerx=global_centerx_max;
  }
  else
  {
-  document.getElementById('button_wms_moveright').disabled=0;
+//  document.getElementById('button_wms_moveright').disabled=0;
  }
 
  if ( global_zoom_centery <= global_centery_min )
  {
-  document.getElementById('button_wms_movedown').disabled=1;
+//  document.getElementById('button_wms_movedown').disabled=1;
   global_zoom_centery=global_centery_min;
  }
  else
  {
-  document.getElementById('button_wms_movedown').disabled=0;
+//  document.getElementById('button_wms_movedown').disabled=0;
  }
 
  if ( global_centery_max <= global_zoom_centery )
  {
-  document.getElementById('button_wms_moveup').disabled=1;
+//  document.getElementById('button_wms_moveup').disabled=1;
   global_zoom_centery=global_centery_max;
  }
  else
  {
-  document.getElementById('button_wms_moveup').disabled=0;
+//  document.getElementById('button_wms_moveup').disabled=0;
  }
 
- document.getElementById('wms_mapimg').src='$GLOBAL_URL?type=wmsimage&zoomlevel=' + global_zoomlevel + '&centerx=' + global_zoom_centerx + '&centery=' + global_zoom_centery;
+ document.getElementById('wms_mapimage').src='$GLOBAL_URL?module=wmsimage&zoomlevel=' + global_zoomlevel + '&centerx=' + global_zoom_centerx + '&centery=' + global_zoom_centery;
 }
 
 function calculate_zoom()
@@ -198,15 +212,15 @@ function calculate_zoom()
 
 function wms_hideflowframes()
 {
- parent.document.getElementById('map_maptip').style.visibility=\"hidden\";
- parent.document.getElementById('map_maptip').width=0;
- parent.document.getElementById('map_maptip').height=0;
- parent.document.getElementById('searchresult_container').style.visibility=\"hidden\";
- parent.document.getElementById('searchresult_container').width=0;
- parent.document.getElementById('searchresult_container').height=0;
+ parent.document.getElementById('iframe_maptip').style.visibility=\"hidden\";
+ parent.document.getElementById('iframe_maptip').width=0;
+ parent.document.getElementById('iframe_maptip').height=0;
+ parent.document.getElementById('iframe_searchresult').style.visibility=\"hidden\";
+ parent.document.getElementById('iframe_searchresult').width=0;
+ parent.document.getElementById('iframe_searchresult').height=0;
 }
 
-function wms_mapimg_click(object, event)
+function wms_mapimage_click(object, event)
 {
  var imgX = event.clientX - Math.floor(object.getBoundingClientRect().left);
  var imgY = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(object.getBoundingClientRect().top);
@@ -215,16 +229,16 @@ function wms_mapimg_click(object, event)
 
  wms_hideflowframes();
 
- // if ( imgX < ${CONFIG_WMS_MAPIMAGE_WIDTH} ) ${CONFIG_WMS_MAPIMAGE_HEIGHT}
- parent.document.getElementById('map_maptip').style.left=clickX;
- parent.document.getElementById('map_maptip').style.top=clickY;
- parent.document.getElementById('map_maptip').style.width=0;
- parent.document.getElementById('map_maptip').style.height=0;
- parent.document.getElementById('map_maptip').src='$GLOBAL_URL?type=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
- document.getElementById('wms_mapimgurl').value='$GLOBAL_URL?type=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
+ // if ( imgX < ${CONFIG_WMS_MAPIMAGEWIDTH} ) ${CONFIG_WMS_MAPIMAGEHEIGHT}
+ parent.document.getElementById('iframe_maptip').style.left=clickX;
+ parent.document.getElementById('iframe_maptip').style.top=clickY;
+ parent.document.getElementById('iframe_maptip').style.width=0;
+ parent.document.getElementById('iframe_maptip').style.height=0;
+ parent.document.getElementById('iframe_maptip').src='$GLOBAL_URL?module=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
+ document.getElementById('wms_mapimageurl').value='$GLOBAL_URL?module=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
 }
 
-function wms_mapimg_onwheel(object, event)
+function wms_mapimage_onwheel(object, event)
 {
  var local_wheeldelta;
 
@@ -260,8 +274,8 @@ function wms_mapimg_onwheel(object, event)
  var imgX = event.clientX - Math.floor(object.getBoundingClientRect().left);
  var imgY = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(object.getBoundingClientRect().top);
 
- global_centerx=global_zoom_centerx + Math.floor((global_width/($CONFIG_WMS_MAPIMAGE_WIDTH*global_zoom_widthrate))*(imgX-($CONFIG_WMS_MAPIMAGE_WIDTH/2)));
- global_centery=global_zoom_centery - Math.floor((global_height/($CONFIG_WMS_MAPIMAGE_HEIGHT*global_zoom_heightrate))*(imgY-($CONFIG_WMS_MAPIMAGE_HEIGHT/2)));
+ global_centerx=global_zoom_centerx + Math.floor((global_width/($CONFIG_WMS_MAPIMAGEWIDTH*global_zoom_widthrate))*(imgX-($CONFIG_WMS_MAPIMAGEWIDTH/2)));
+ global_centery=global_zoom_centery - Math.floor((global_height/($CONFIG_WMS_MAPIMAGEHEIGHT*global_zoom_heightrate))*(imgY-($CONFIG_WMS_MAPIMAGEHEIGHT/2)));
 
  if ( local_wheeldata >= 0 )
  {
@@ -273,7 +287,7 @@ function wms_mapimg_onwheel(object, event)
  }
 }
 
-function wms_mapimg_onmousedown(object, event)
+function wms_mapimage_onmousedown(object, event)
 {
  if (global_block_zoompan)
  {
@@ -292,7 +306,7 @@ function wms_mapimg_onmousedown(object, event)
 // global_drag_interval=setIntreval(wms_drag_showmap, 1000);
 }
 
-function wms_mapimg_onmouseup(object, event)
+function wms_mapimage_onmouseup(object, event)
 {
  if (global_block_zoompan)
  {
@@ -306,18 +320,18 @@ function wms_mapimg_onmouseup(object, event)
 
  if (local_deltaX == 0 && local_deltaY == 0)
  {
-  wms_mapimg_click(object, event);
+  wms_mapimage_click(object, event);
   return;
  }
 
- global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGE_WIDTH})*(global_width/global_zoom_widthrate));
- global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGE_HEIGHT})*(global_height/global_zoom_heightrate));
+ global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGEWIDTH})*(global_width/global_zoom_widthrate));
+ global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGEHEIGHT})*(global_height/global_zoom_heightrate));
 
  wms_movecenter();
  wms_showmap();
 }
 
-function wms_mapimg_onmouseleave(object, event)
+function wms_mapimage_onmouseleave(object, event)
 {
  if (global_block_zoompan)
  {
@@ -334,14 +348,14 @@ function wms_mapimg_onmouseleave(object, event)
  var local_deltaX=event.clientX-global_drag_startx;
  var local_deltaY=event.clientY-global_drag_starty;
 
- global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGE_WIDTH})*(global_width/global_zoom_widthrate));
- global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGE_HEIGHT})*(global_height/global_zoom_heightrate));
+ global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGEWIDTH})*(global_width/global_zoom_widthrate));
+ global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGEHEIGHT})*(global_height/global_zoom_heightrate));
 
  wms_movecenter();
  wms_showmap();
 }
 
-function wms_mapimg_onload()
+function wms_mapimage_onload()
 {
  global_block_zoompan=false;
  wms_hideflowframes();
@@ -465,3 +479,7 @@ function wms_moveright()
 }
 
 </script>"
+
+echo "
+</body>
+</html>"

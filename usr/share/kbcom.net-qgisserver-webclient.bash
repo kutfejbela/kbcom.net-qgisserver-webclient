@@ -3,23 +3,20 @@
 GLOBAL_FOLDER_SCRIPT=$(/usr/bin/dirname "$0")
 source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient.bash"
 
-#source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient-html.conf
 source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient.conf
 
-
 GLOBAL_URL=$(shell_url)
-SHELL_GET_TYPE=$(shell_get_value type)
+SHELL_GET_MODULE=$(shell_get_value "module")
 
-case "$SHELL_GET_TYPE" in
-showsearch)
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showsearch.bash"
+case "$SHELL_GET_MODULE" in
+search)
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-search.bash"
  ;;
 searchresult)
- show_header_html
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showsearchresult.bash"
- show_footer_html
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-searchresult.bash"
  ;;
 wmsimage)
+# show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmapimg.bash"
  ;;
 wmsmaptip)
@@ -27,19 +24,11 @@ wmsmaptip)
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmaptip.bash"
  show_footer_html
  ;;
-showmap)
- show_header_html
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmap.bash"
- show_footer_html
+map)
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-map.bash"
  ;;
-showhtml)
- show_header_html "
-<meta http-equiv="refresh" content="${CONFIG_HTML_REFRESHINTERVAL}">
-<style>
-${CONFIG_HTML_CSS}
-</style>"
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showhtml.bash"
- show_footer_html
+html)
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-html.bash"
  ;;
 *)
  show_header_html

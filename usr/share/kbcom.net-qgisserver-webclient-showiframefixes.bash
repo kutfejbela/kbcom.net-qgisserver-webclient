@@ -9,9 +9,9 @@ echo "
  iframe.fixhidden { position: absolute; visibility: hidden; top: 0; left:0; width: 100%; height: 0; margin: 0; padding: 0; border: 0; background-color: transparent; }
 </style>
 
-<iframe id='iframe_search' src='$GLOBAL_URL?type=showsearch' class='fixhidden' onload='iframe_search_onload();'></iframe>
-<iframe id='iframe_map' src='$GLOBAL_URL?type=showmap' class='fixhidden' onload='iframe_map_onload();'></iframe>
-<iframe id='iframe_html' src='$GLOBAL_URL?type=showhtml' class='fixhidden' onload='iframe_html_onload();'></iframe>
+<iframe id='iframe_search' src='$GLOBAL_URL?module=search' class='fixhidden' onload='iframe_search_onload();'></iframe>
+<iframe id='iframe_map' src='$GLOBAL_URL?module=map' class='fixhidden' onload='iframe_map_onload();'></iframe>
+<iframe id='iframe_html' src='$GLOBAL_URL?module=html' class='fixhidden' onload='iframe_html_onload();'></iframe>
 "
 
 ### SEARCH onload ###

@@ -56,7 +56,13 @@ function iframe_searchresult_setposition(parameter_x, parameter_y)
 
 function iframe_searchresult_setsrc(parameter_searchtext)
 {
+ var local_searchtext;
 
+ local_searchtext = parameter_searchtext.replace('%','%25');
+ local_searchtext = local_searchtext.replace('&','%26');
+ local_searchtext = local_searchtext.replace('\t','%09');
+
+ document.getElementById('iframe_searchresult').src='$GLOBAL_URL?module=searchresult&searchtext=' + local_searchtext;
 }
 
 function iframe_searchresult_onload()

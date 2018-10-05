@@ -8,13 +8,13 @@ GLOBAL_STRING_PROPERTY=""
 GLOBAL_STRING_VALUE=""
 
 # GetCapabilities
-#export QUERY_STRING="request=GetCapabilities&service=WFS&version=2.0.2&map=$GLOBAL_FILE_QGISPROJECT"
+#export QUERY_STRING="request=GetCapabilities&service=WFS&version=1.0.0&map=$GLOBAL_FILE_QGISPROJECT"
 
 # DescribeFeatureType
-#export QUERY_STRING="request=DescribeFeatureType&service=WFS&version=2.0.0&map=$GLOBAL_FILE_QGISPROJECT"
+#export QUERY_STRING="request=DescribeFeatureType&service=WFS&version=1.0.0&map=$GLOBAL_FILE_QGISPROJECT"
 
 # GetFeature (Filter)
-QUERY_STRING="request=GetFeature&service=WFS&version=2.0.0&map=$GLOBAL_FILE_QGISPROJECT"
+QUERY_STRING="request=GetFeature&service=WFS&version=1.0.0&map=$GLOBAL_FILE_QGISPROJECT"
 QUERY_STRING="$QUERY_STRING&outputFormat=GeoJSON&maxFeatures=16"
 QUERY_STRING="$QUERY_STRING&typename=$GLOBAL_STRING_LAYER"
 QUERY_STRING="$QUERY_STRING&Filter=<Filter>"
