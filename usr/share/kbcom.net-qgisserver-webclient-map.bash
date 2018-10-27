@@ -170,7 +170,6 @@ var global_boolean_blockzoom=false;
 echo "
 // ### HTML script: calculate zoom and show mapimage ###
 
-//mapimage_calculatezoom();
 mapimage_setsrc();
 
 function mapimage_checkx()
@@ -196,7 +195,6 @@ function mapimage_checkx()
   return;
  }
 }
-
 
 function mapimage_checky()
 {
@@ -226,103 +224,8 @@ function mapimage_setsrc()
 {
  global_block_zoompan=true;
 
-// if ( global_zoomlevel_max <= global_zoomlevel )
-// {
-//  document.getElementById('button_wms_zoomin').disabled=1;
-//  global_zoomlevel=global_zoomlevel_max;
-// }
-// else
-// {
-//  document.getElementById('button_wms_zoomin').disabled=0;
-// }
-
-// if ( global_zoomlevel <= global_zoomlevel_min )
-// {
-//  document.getElementById('button_wms_zoomout').disabled=1;
-//  global_zoomlevel=global_zoomlevel_min;
-// }
-// else
-// {
-//  document.getElementById('button_wms_zoomout').disabled=0;
-// }
-
-// if ( global_zoom_centerx <= global_centerx_min )
-// {
-//  document.getElementById('button_wms_moveleft').disabled=1;
-// }
-// else
-// {
-//  document.getElementById('button_wms_moveleft').disabled=0;
-// }
-
-// if ( global_centerx_max <= global_zoom_centerx )
-// {
-//  document.getElementById('button_wms_moveright').disabled=1;
-//  global_zoom_centerx=global_centerx_max;
-// }
-// else
-// {
-//  document.getElementById('button_wms_moveright').disabled=0;
-// }
-
-// if ( global_zoom_centery <= global_centery_min )
-// {
-//  document.getElementById('button_wms_movedown').disabled=1;
-//  global_zoom_centery=global_centery_min;
-// }
-// else
-// {
-//  document.getElementById('button_wms_movedown').disabled=0;
-// }
-
-// if ( global_centery_max <= global_zoom_centery )
-// {
-//  document.getElementById('button_wms_moveup').disabled=1;
-//  global_zoom_centery=global_centery_max;
-// }
-// else
-// {
-//  document.getElementById('button_wms_moveup').disabled=0;
-// }
-
-alert('$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&topy=' + global_integer_topy);
+//alert('$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&topy=' + global_integer_topy);
  document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&topy=' + global_integer_topy;
-}
-
-function mapimage_calculatezoom()
-{
- global_zoom_widthrate=Math.pow(global_zoomlevel, 2)*global_zoomlevel_stepsquare;
- global_zoom_heightrate=Math.pow(global_zoomlevel, 2)*global_zoomlevel_stepsquare;
-
- if ( global_zoom_widthrate <= 1 )
- {
-  global_movex=0;
-  global_zoom_centerx=global_minx + Math.floor((global_maxx-global_minx)/2);
-//  global_centerx_min=global_zoom_centerx;
-//  global_centerx_max=global_zoom_centerx;
- }
- else
- {
-  global_zoom_centerx=global_centerx;
-  global_movex=Math.floor(global_move_percentage*(global_width/global_zoom_widthrate));
-//  global_centerx_min=global_minx+global_movex;
-//  global_centerx_max=global_maxx-global_movex;
- }
-
- if ( global_zoom_heightrate <= 1 )
- {
-  global_movey=0;
-  global_zoom_centery=global_miny + Math.floor((global_maxy-global_miny)/2);
-//  global_centery_min=global_zoom_centery;
-//  global_centery_max=global_zoom_centery;
- }
- else
- {
-  global_zoom_centery=global_centery;
-  global_movey=Math.floor(global_move_percentage*(global_height/global_zoom_heightrate));
-//  global_centery_min=global_miny+global_movey;
-//  global_centery_max=global_maxy-global_movey;
- }
 }
 
 function mapimage_pandelta()
