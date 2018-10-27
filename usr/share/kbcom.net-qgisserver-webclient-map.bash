@@ -137,6 +137,9 @@ var global_integer_topy=$GLOBAL_INTEGER_TOPY;"
 echo "
 // ### HTML script: calculate variables ###
 
+var global_integer_maxwidth=global_integer_maximumx - global_integer_minimumx;
+var global_integer_maxheight=global_integer_maximumy - global_integer_minimumy;
+
 var global_real_zoomlevelstepsquare=Math.pow($CONFIG_WMS_ZOOMLEVELSTEP, 2);
 var global_real_movepercentage=$CONFIG_WMS_MOVEPERCENTAGE/100;
 
@@ -157,11 +160,6 @@ echo "
 var global_boolean_blockpanzoom=false;
 var global_boolean_blockzoom=false;
 
-//var global_zoom_widthrate=0;
-//var global_zoom_heightrate=0;
-//var global_zoom_centerx=0;
-//var global_zoom_centery=0;
-
 //var global_drag_startx=0;
 //var global_drag_starty=0;
 //var global_is_dragdrop=false;
@@ -174,6 +172,55 @@ echo "
 
 //mapimage_calculatezoom();
 mapimage_setsrc();
+
+function mapimage_checkx()
+{
+ var local_integer_maximumx;
+
+ if (global_integer_zoomwidth > global_integer_maxwidth)
+ {
+  return;
+ }
+
+ if ( global_integer_leftx < global_integer_minimumx )
+ {
+  global_integer_leftx=global_integer_minimumx;
+  return;
+ }
+
+ local_integer_maximumx=global_integer_maximumx - global_integer_zoomwidth;
+
+ if ( local_integer_maximumx < global_integer_leftx )
+ {
+  global_integer_leftx=local_integer_maximumx;
+  return;
+ }
+}
+
+
+function mapimage_checky()
+{
+ var local_integer_maximumy;
+
+ if (global_integer_zoomheight > global_integer_maxheight)
+ {
+  return;
+ }
+
+ if ( global_integer_topy < global_integer_minimumy )
+ {
+  global_integer_topy=global_integer_minimumy;
+  return;
+ }
+
+ local_integer_maximumy=global_integer_maximumy - global_integer_zoomheight;
+
+ if ( local_integer_maximumy < global_integer_topy )
+ {
+  global_integer_topy=local_integer_maximumy;
+  return;
+ }
+}
 
 function mapimage_setsrc()
 {
@@ -388,7 +435,8 @@ function mapimage_zoomout()
  global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
  global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
 
- mapimage_checkbbox();
+ mapimage_checkx();
+ mapimage_checky();
  mapimage_setsrc();
 }
 
