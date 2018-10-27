@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Content-type: text/html;charset=UTF-8"
+echo
+
 ### SEARCH head & style classes ###
 
 echo "

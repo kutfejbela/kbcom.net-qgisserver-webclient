@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Content-type: text/html;charset=UTF-8"
+echo
+
 ### SEARCHRESULT head & style classes ###
 
 echo "
@@ -20,8 +23,14 @@ $CONFIG_SEARCHRESULT_CSS
 SHELL_GET_SEARCHTEXT=$(shell_get_value "searchtext")
 
 # WFS search cannot sort and cannot handle non-ascii characters
-GLOBAL_DBSTRING_SEARCHRESULT=$(download_wfs_searchresult "$SHELL_GET_SEARCHTEXT" | sort )
-GLOBAL_STRING_SERCHRESULTHTML=""
+#GLOBAL_DBSTRING_SEARCHRESULT=$(request_wfs_searchresult "$SHELL_GET_SEARCHTEXT" | sort )
+
+GLOBAL_STRING_SQLLIKE=$(convert_spaceseparetedstring_sqllikestring "$SHELL_GET_SEARCHTEXT")
+GLOBAL_DBSTRING_SEARCHRESULT=$(request_sql_searchresult "$GLOBAL_STRING_SQLLIKE")
+
+GLOBAL_DBSTRING_SEARCHRESULT
+
+GLOBAL_STRING_HTMLOUTPUT=""
 
 if [ -z "$GLOBAL_DBSTRING_SEARCHRESULT" ]
 then
@@ -49,9 +58,9 @@ $GLOBAL_STRING_HTMLOUTPUT
 
   GLOBAL_STRING_HTMLOUTPUT+="
 <p class='searchresult-item'
- onclick='parent.document.getElementById(\"map\").src=\"$GLOBAL_URL?type=showmap&id=${GLOBAL_ARRAY_SEARCHRESULT[1]}\";
+ onclick='parent.document.getElementById(\"map\").src=\"$GLOBAL_URL?type=showmap&id=${GLOBAL_ARRAY_SEARCHRESULT[0]}\";
  parent.document.getElementById(\"search_result\").style.visible=\"hidden\";'>"
-  GLOBAL_STRING_HTMLOUTPUT+=$(convert_escapedstring_html "${GLOBAL_ARRAY_SEARCHRESULT[0]/\\\//\/}")
+  GLOBAL_STRING_HTMLOUTPUT+=$(convert_escapedstring_html "${GLOBAL_ARRAY_SEARCHRESULT[1]/\\\//\/}")
   GLOBAL_STRING_HTMLOUTPUT+="</p>"
  done
 fi

@@ -15,9 +15,9 @@ search)
 searchresult)
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-searchresult.bash"
  ;;
-wmsimage)
+mapimage)
 # show_header_html
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmapimg.bash"
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-mapimg.bash"
  ;;
 wmsmaptip)
  show_header_html
@@ -31,7 +31,5 @@ html)
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-html.bash"
  ;;
 *)
- show_header_html
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmain.bash"
- show_footer_html
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-main.bash"
 esac

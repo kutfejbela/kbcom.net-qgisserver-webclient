@@ -59,9 +59,12 @@ check_value_integer()
 check_value_integerbetweendefault()
 {
  local PARAMETER_STRING_INTEGERVALUE="$1"
- local PARAMETER_INTEGER_MIN="$2"
- local PARAMETER_INTEGER_MAX="$3"
+ local PARAMETER_INTEGER_BETWEEN1="$2"
+ local PARAMETER_INTEGER_BETWEEN2="$3"
  local PARAMETER_INTEGER_DEFAULT="$4"
+
+ local LOCAL_STRING_INTEGERPOSITIVEVALUE
+
 
  if [ -z "$PARAMETER_STRING_INTEGERVALUE" ]
  then
@@ -69,25 +72,41 @@ check_value_integerbetweendefault()
   return
  fi
 
- if [ ! -z "${PARAMETER_STRING_INTEGERVALUE//[0-9]}" ]
+ LOCAL_STRING_INTEGERPOSITIVEVALUE=${PARAMETER_STRING_INTEGERVALUE#-}
+
+ if [ ! -z "${LOCAL_STRING_INTEGERPOSITIVEVALUE//[0-9]}" ]
  then
   echo "$PARAMETER_INTEGER_DEFAULT"
   return
  fi
 
- if [ "$PARAMETER_STRING_INTEGERVALUE" -lt "$PARAMETER_INTEGER_MIN" ]
+ if [ "$PARAMETER_INTEGER_BETWEEN1" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN2" ]
  then
-  echo "$PARAMETER_INTEGER_DEFAULT"
+  echo "$PARAMETER_STRING_INTEGERVALUE"
   return
  fi
 
- if [ "$PARAMETER_STRING_INTEGERVALUE" -gt "$PARAMETER_INTEGER_MAX" ]
+ if [ "$PARAMETER_INTEGER_BETWEEN2" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN1" ]
  then
-  echo "$PARAMETER_INTEGER_DEFAULT"
+  echo "$PARAMETER_STRING_INTEGERVALUE"
   return
  fi
 
- echo "$PARAMETER_STRING_INTEGERVALUE"
+ echo "$PARAMETER_INTEGER_DEFAULT"
+}
+
+convert_spaceseparetedstring_sqllikestring()
+{
+ local PARAMETER_STRING_STRING="$1"
+
+ local LOCAL_STRING_RESULT
+
+ LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING//\\/\\\\}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//%/\\%}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//_/\\_}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT// /%}
+
+ echo "$LOCAL_STRING_RESULT"
 }
 
 convert_escapedstring_html()
@@ -203,159 +222,94 @@ convert_stringtemplate_string()
  echo "$LOCAL_STRING_RESULT"
 }
 
-### USE psql instead WFS ###
-# QGIS Server WFS have a problem with non US character and
-# does not support srsName and sortBy
-
-request_sql_searchresult()
+convert_real_integer()
 {
- local PARAMETER_STRING_ID="$1"
+ local PARAMETER_STRING_INTEGERVALUE="$1"
+ local PARAMETER_INTEGER_DECIMAL="$2"
 
- local LOCAL_ROWSTING_RESULT
-
- LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
-copy (
- select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
- where \"$CONFIG_MAPIMAGE_WFSIDFIELD\" = '$PARAMETER_STRING_ID'
- limit 1
-)
-to stdout with delimiter as E'\t' null as ''"
- )
+ if [ "$PARAMETER_INTEGER_DECIMAL" == "0" ]
+ then
+  echo "$PARAMETER_STRING_INTEGERVALUE"
+ else
+  echo "${PARAMETER_STRING_INTEGERVALUE:0:-$PARAMETER_INTEGER_DECIMAL}.${PARAMETER_STRING_INTEGERVALUE: -$PARAMETER_INTEGER_DECIMAL}"
+ fi
 }
-
-request_sql_geombyid()
-{
- local PARAMETER_STRING_ID="$1"
-
- local LOCAL_ROWSTING_RESULT
-
- LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
-copy (
- select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
- where \"$CONFIG_MAPIMAGE_WFSIDFIELD\" = '$PARAMETER_STRING_ID'
- limit 1
-)
-to stdout with delimiter as E'\t' null as ''"
- )
-
- echo "$LOCAL_ROWSTRING_RESULT"
-}
-
-request_sql_geombyotherid()
-{
- local PARAMETER_STRING_OTHERID="$1"
-
- local LOCAL_ROWSTRING_RESULT
-
- LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
-copy (
- select min(st_xmin(\"geom\")), min(st_ymin(\"geom\")), max(st_xmax(\"geom\")), max(st_ymax(\"geom\"))
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
- where \"$CONFIG_MAPIMAGE_WFSOTHERIDFIELD\" = '$PARAMETER_STRING_OTHERID'
-)
-to stdout with delimiter as E'\t' null as ''"
-)
-
- echo "$LOCAL_ROWSTRING_RESULT"
-}
-
-
-
-
-
-
-
 
 calculate_bbox()
 {
- local LOCAL_PARAMETER_ZOOMLEVEL="$1"
- local LOCAL_PARAMETER_CENTERX="$2"
- local LOCAL_PARAMETER_CENTERY="$3"
+ local PARAMETER_INTEGER_ZOOMLEVEL="$1"
+ local PARAMETER_INTEGER_LEFTX="$2"
+ local PARAMETER_INTEGER_TOPY="$3"
 
- local LOCAL_ZOOM_DIVIDE
- local LOCAL_WMS_MAXWIDTH
- local LOCAL_WMS_MAXHEIGHT
- local LOCAL_HALFWIDTH
- local LOCAL_HALFHEIGHT
- local LOCAL_BBOX_MINX
- local LOCAL_BBOX_MAXX
- local LOCAL_BBOX_MINY
- local LOCAL_BBOX_MAXY
- local LOCAL_OFFSET_X
- local LOCAL_OFFSET_Y
+ local LOCAL_INTEGER_ZOOMDIVIDE
+ local LOCAL_INTEGER_ZOOMWIDTH
+ local LOCAL_INTEGER_ZOOMHEIGHT
+ local LOCAL_BBOX_MINIMUMX
+ local LOCAL_BBOX_MAXIMUMX
+ local LOCAL_BBOX_MINIMUMY
+ local LOCAL_BBOX_MAXIMUMY
 
+ LOCAL_INTEGER_ZOOMDIVIDE=$(( ($PARAMETER_INTEGER_ZOOMLEVEL * $CONFIG_WMS_ZOOMLEVELSTEP) ** 2 ))
 
- if [ "$LOCAL_PARAMETER_ZOOMLEVEL" -lt 1 ]
+ LOCAL_INTEGER_ZOOMWIDTH=$(( $CONFIG_WMS_DEFAULTWIDTH / $LOCAL_INTEGER_ZOOMDIVIDE ))
+ LOCAL_INTEGER_ZOOMHEIGHT=$(( $CONFIG_WMS_DEFAULTHEIGHT / $LOCAL_INTEGER_ZOOMDIVIDE ))
+
+ LOCAL_BBOX_MINIMUMX=$PARAMETER_INTEGER_LEFTX
+ LOCAL_BBOX_MAXIMUMX=$(( $PARAMETER_INTEGER_LEFTX + $LOCAL_INTEGER_ZOOMWIDTH ))
+ LOCAL_BBOX_MINIMUMY=$PARAMETER_INTEGER_TOPY
+ LOCAL_BBOX_MAXIMUMY=$(( $PARAMETER_INTEGER_TOPY + $LOCAL_INTEGER_ZOOMHEIGHT ))
+
+ if [ "$CONFIG_WMS_COORDINATEDECIMAL" -ne 0 ]
  then
-  LOCAL_PARAMETER_ZOOMLEVEL=1
-  return
+  LOCAL_BBOX_MINIMUMX=$(convert_real_integer "$LOCAL_BBOX_MINIMUMX" "$CONFIG_WMS_COORDINATEDECIMAL")
+  LOCAL_BBOX_MAXIMUMX=$(convert_real_integer "$LOCAL_BBOX_MAXIMUMX" "$CONFIG_WMS_COORDINATEDECIMAL")
+  LOCAL_BBOX_MINIMUMY=$(convert_real_integer "$LOCAL_BBOX_MINIMUMY" "$CONFIG_WMS_COORDINATEDECIMAL")
+  LOCAL_BBOX_MAXIMUMY=$(convert_real_integer "$LOCAL_BBOX_MAXIMUMY" "$CONFIG_WMS_COORDINATEDECIMAL")
  fi
 
- LOCAL_ZOOM_DIVIDE=$(( ($LOCAL_PARAMETER_ZOOMLEVEL * $CONFIG_WMS_ZOOMLEVELSTEP) ** 2 ))
-
- let "LOCAL_MAXWIDTH=$CONFIG_WMS_MAXX - $CONFIG_WMS_MINX"
- let "LOCAL_MAXHEIGHT=$CONFIG_WMS_MAXY - $CONFIG_WMS_MINY"
- let "LOCAL_ZOOM_WIDTH=$LOCAL_MAXWIDTH / $LOCAL_ZOOM_DIVIDE"
- let "LOCAL_ZOOM_HEIGHT=$LOCAL_MAXHEIGHT / $LOCAL_ZOOM_DIVIDE"
-
- if [ "$LOCAL_ZOOM_WIDTH" -gt "$LOCAL_MAXWIDTH" ]
- then
-  let "LOCAL_CENTERX=$CONFIG_WMS_MINX + ($LOCAL_MAX_WIDTH / 2)"
-  let "LOCAL_ZOOM_HALFWIDTH=$LOCAL_ZOOM_WIDTH / 2"
-  let "LOCAL_BBOX_MINX=$LOCAL_CENTERX - $LOCAL_ZOOM_HALFWIDTH"
-  let "LOCAL_BBOX_MAXX=$LOCAL_CENTERX + $LOCAL_ZOOM_HALFWIDTH"
- else
-  let "LOCAL_ZOOM_HALFWIDTH=$LOCAL_ZOOM_WIDTH / 2"
-  let "LOCAL_BBOX_MINX=$LOCAL_PARAMETER_CENTERX - $LOCAL_ZOOM_HALFWIDTH"
-  let "LOCAL_BBOX_MAXX=$LOCAL_PARAMETER_CENTERX + $LOCAL_ZOOM_HALFWIDTH"
-
-  if [ "$LOCAL_BBOX_MINX" -lt "$CONFIG_WMS_MINX" ]
-  then
-   let "LOCAL_OFFSET_X=$CONFIG_WMS_MINX - $LOCAL_BBOX_MINX"
-   let "LOCAL_BBOX_MINX+=$LOCAL_OFFSET_X"
-   let "LOCAL_BBOX_MAXX+=$LOCAL_OFFSET_X"
-  fi
-
-  if [ "$CONFIG_WMS_MAXX" -lt "$LOCAL_BBOX_MAXX" ]
-  then
-   let "LOCAL_OFFSET_X=$LOCAL_BBOX_MAXX - $CONFIG_WMS_MAXX"
-   let "LOCAL_BBOX_MINX-=$LOCAL_OFFSET_X"
-   let "LOCAL_BBOX_MAXX-=$LOCAL_OFFSET_X"
-  fi
- fi
-
- if [ "$LOCAL_ZOOM_HEIGHT" -gt "$LOCAL_MAXHEIGHT" ]
- then
-  let "LOCAL_CENTERY=$CONFIG_WMS_MINY + ($LOCAL_MAXHEIGHT / 2)"
-  let "LOCAL_ZOOM_HALFHEIGHT=$LOCAL_ZOOM_HEIGHT / 2"
-  let "LOCAL_BBOX_MINY=$LOCAL_CENTERY - $LOCAL_ZOOM_HALFHEIGHT"
-  let "LOCAL_BBOX_MAXY=$LOCAL_CENTERY + $LOCAL_ZOOM_HALFHEIGHT"
- else
-  let "LOCAL_ZOOM_HALFHEIGHT=$LOCAL_ZOOM_HEIGHT / 2"
-  let "LOCAL_BBOX_MINY=$LOCAL_PARAMETER_CENTERY - $LOCAL_ZOOM_HALFHEIGHT"
-  let "LOCAL_BBOX_MAXY=$LOCAL_PARAMETER_CENTERY + $LOCAL_ZOOM_HALFHEIGHT"
-
-  if [ "$LOCAL_BBOX_MINY" -lt "$CONFIG_WMS_MINY" ]
-  then
-   let "LOCAL_OFFSET_Y=$CONFIG_WMS_MINY - $LOCAL_BBOX_MINY"
-   let "LOCAL_BBOX_MINY+=$LOCAL_OFFSET_Y"
-   let "LOCAL_BBOX_MAXY+=$LOCAL_OFFSET_Y"
-  fi
-
-  if [ "$CONFIG_WMS_MAXY" -lt "$LOCAL_BBOX_MAXY" ]
-  then
-   let "LOCAL_OFFSET_Y=$LOCAL_BBOX_MAXY - $CONFIG_WMS_MAXY"
-   let "LOCAL_BBOX_MINY-=$LOCAL_OFFSET_Y"
-   let "LOCAL_BBOX_MAXY-=$LOCAL_OFFSET_Y"
-  fi
- fi
-
- echo "$LOCAL_BBOX_MINX,$LOCAL_BBOX_MINY,$LOCAL_BBOX_MAXX,$LOCAL_BBOX_MAXY"
+ echo "$LOCAL_BBOX_MINIMUMX,$LOCAL_BBOX_MINIMUMY,$LOCAL_BBOX_MAXIMUMX,$LOCAL_BBOX_MAXIMUMY"
 }
 
-download_wfs_searchresult()
+request_image_wms()
+{
+ local PARAMETER_INTEGER_MAPIMAGEWIDTH="$1"
+ local PARAMETER_BBOX="$2"
+
+ local QUERY_STRING
+
+ QUERY_STRING="request=GetMap&service=WMS&version=1.3.0"
+ QUERY_STRING+="&map=$CONFIG_QGIS_PROJECTFILE"
+
+ QUERY_STRING+="&layers=$CONFIG_MAPIMAGE_WMSLAYERS"
+
+ QUERY_STRING+="&styles=$CONFIG_WMS_STYLES"
+ QUERY_STRING+="&crs=$CONFIG_WMS_CRS"
+ QUERY_STRING+="&time=$CONFIG_WMS_TIMEFORMAT"
+
+ QUERY_STRING+="&bbox=$PARAMETER_BBOX"
+
+ QUERY_STRING+="&transparent=$CONFIG_WMS_TRANSPARENT"
+ QUERY_STRING+="&bgcolor=$CONFIG_WMS_BGCOLOR"
+ QUERY_STRING+="&width=$PARAMETER_INTEGER_MAPIMAGEWIDTH"
+ QUERY_STRING+="&height=$CONFIG_WMS_IMAGEHEIGHT"
+ QUERY_STRING+="&format=$CONFIG_WMS_FORMAT"
+#echo "$QUERY_STRING"
+
+ /usr/bin/cgi-fcgi -bind -connect $CONFIG_QGISSERVER_SOCKET
+}
+
+
+
+
+
+
+
+
+
+
+
+
+request_wfs_searchresult()
 {
  local LOCAL_STRING_TEMP
 
@@ -423,7 +377,7 @@ download_wfs_searchresult()
    then
     if [ ! -z "$LOCAL_STRING_IDFIELD" ] && [ ! -z "$LOCAL_STRING_SEARCHFIELD" ]
     then
-     printf "%s\t%s\n" "$LOCAL_STRING_SEARCHFIELD" "$LOCAL_STRING_IDFIELD"
+     printf "%s\t%s\n" "$LOCAL_STRING_IDFIELD" "$LOCAL_STRING_SEARCHFIELD"
     fi
 
     LOCAL_BOOLEAN_WFSACTIVEROW=""
@@ -432,31 +386,16 @@ download_wfs_searchresult()
  done
 }
 
-download_image_wms()
-{
- local LOCAL_PARAMETER_BBOX="$1"
 
- local QUERY_STRING
 
- QUERY_STRING="request=GetMap&service=WMS&version=1.3.0"
- QUERY_STRING+="&map=$CONFIG_QGIS_PROJECTFILE"
 
- QUERY_STRING+="&layers=$CONFIG_WMS_MAPIMAGELAYERS"
 
- QUERY_STRING+="&styles=$CONFIG_WMS_STYLES"
- QUERY_STRING+="&crs=$CONFIG_WMS_CRS"
- QUERY_STRING+="&time=$CONFIG_WMS_TIMEFORMAT"
 
- QUERY_STRING+="&bbox=$LOCAL_PARAMETER_BBOX"
 
- QUERY_STRING+="&transparent=$CONFIG_WMS_MAPIMAGETRANSPARENT"
- QUERY_STRING+="&bgcolor=$CONFIG_WMS_MAPIMAGEBGCOLOR"
- QUERY_STRING+="&width=$CONFIG_WMS_MAPIMAGEWIDTH"
- QUERY_STRING+="&height=$CONFIG_WMS_MAPIMAGEHEIGHT"
- QUERY_STRING+="&format=$CONFIG_WMS_MAPIMAGEFORMAT"
 
- /usr/bin/cgi-fcgi -bind -connect $CONFIG_QGISSERVER_SOCKET
-}
+
+
+
 
 download_info_wms()
 {
@@ -478,8 +417,8 @@ download_info_wms()
 
  QUERY_STRING+="&bbox=$LOCAL_PARAMETER_BBOX"
 
- QUERY_STRING+="&width=$CONFIG_WMS_MAPIMAGEWIDTH"
- QUERY_STRING+="&height=$CONFIG_WMS_MAPIMAGEHEIGHT"
+ QUERY_STRING+="&width=$PARAMETER_INTEGER_MAPIMAGEWIDTH"
+ QUERY_STRING+="&height=$CONFIG_WMS_IMAGEHEIGHT"
  QUERY_STRING+="&i=$LOCAL_PARAMETER_X"
  QUERY_STRING+="&j=$LOCAL_PARAMETER_Y"
 
@@ -488,32 +427,6 @@ download_info_wms()
 
 
 
-
-
-show_header_html()
-{
- echo "Content-type: text/html;charset=UTF-8"
- echo
-
-# echo "<!DOCTYPE html>"
- echo "<html>"
- echo "<head>"
- echo " <title>${CONFIG_MAIN_TITLE}</title>"
- echo "</head>"
- echo "<body tabindex='-1' style='margin: 0; padding: 0; border: 0;'>"
-}
-
-show_header_jpeg()
-{
- echo "Content-type: "
- echo
-}
-
-show_footer_html()
-{
- echo "</body>"
- echo "</html>"
-}
 
 
 convert_mapbox_geomarray()
@@ -567,4 +480,66 @@ convert_mapbox_geomarray()
  done
 
  echo "$LOCAL_CENTERX $LOCAL_CENTERY $LOCAL_WMS_ZOOMLEVEL"
+}
+
+
+
+
+### USE psql instead WFS ###
+# QGIS Server WFS have a problem with non US character and
+# does not support srsName and sortBy
+
+request_sql_searchresult()
+{
+ local PARAMETER_STRING_SQLLIKE="$1"
+
+ local LOCAL_STRING_SQLQUERY
+
+ LOCAL_STRING_SQLQUERY="/usr/bin/psql -c \"
+  copy (
+   select \\\"$CONFIG_SEARCHRESULT_WFSIDFIELD\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
+   from \\\"$CONFIG_SEARCHRESULT_WFSLAYER\\\"
+   where \\\"cim\\\" ilike '%$PARAMETER_STRING_SQLLIKE%'
+  )
+  to stdout with delimiter as E'\\t' null as ''
+ \""
+
+ echo "$(eval $LOCAL_STRING_SQLQUERY)"
+}
+
+request_sql_geombyid()
+{
+ local PARAMETER_STRING_ID="$1"
+
+ local LOCAL_ROWSTING_RESULT
+
+ LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
+copy (
+ select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
+ from \"$CONFIG_MAPIMAGE_WFSLAYER\"
+ where \"$CONFIG_MAPIMAGE_WFSIDFIELD\" = '$PARAMETER_STRING_ID'
+ limit 1
+)
+to stdout with delimiter as E'\t' null as ''"
+ )
+
+ echo "$LOCAL_ROWSTRING_RESULT"
+}
+
+request_sql_geombyotherid()
+{
+ local PARAMETER_STRING_OTHERID="$1"
+
+ local LOCAL_ROWSTRING_RESULT
+
+ LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
+copy (
+ select min(st_xmin(\"geom\")), min(st_ymin(\"geom\")), max(st_xmax(\"geom\")), max(st_ymax(\"geom\"))
+ from \"$CONFIG_MAPIMAGE_WFSLAYER\"
+ where \"$CONFIG_MAPIMAGE_WFSOTHERIDFIELD\" = '$PARAMETER_STRING_OTHERID'
+)
+to stdout with delimiter as E'\t' null as ''"
+)
+
+ echo "$LOCAL_ROWSTRING_RESULT"
 }

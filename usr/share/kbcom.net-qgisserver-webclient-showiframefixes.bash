@@ -134,7 +134,7 @@ then
  }
 
  var local_iframe_map_rect = document.getElementById('iframe_map').getBoundingClientRect();
- var local_iframe_html_calculatedheight = document.getElementById('div_container').getBoundingClientRect().bottom - local_iframe_map_rect.bottom;
+ var local_iframe_html_calculatedheight = document.getElementById('maincontainer').getBoundingClientRect().bottom - local_iframe_map_rect.bottom;
 
  document.getElementById('iframe_html').style.top = local_iframe_map_rect.bottom;
 

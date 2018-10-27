@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Content-type: text/html;charset=UTF-8"
+echo
+
 ### HTML head & style classes ###
 
 echo "
@@ -14,10 +17,6 @@ $CONFIG_HTML_CSS
 </head>
 <body tabindex='-1'>
 "
-
-echo "<table style='margin: auto; border: 0;'>"
-echo "<tr style='border: 0;'>"
-echo "<td style='border: 0;'>"
 
 printf '\n\n<!-- HTML template processing has started (%(%c)T) -->\n'
 
@@ -63,10 +62,6 @@ do
 done
 
 printf '\n\n<!-- HTML template processing has finished (%(%c)T) -->\n'
-
-echo "</td>"
-echo "</tr>"
-echo "</table>"
 
 echo "
 </body>
