@@ -24,7 +24,7 @@ SHELL_GET_ID=$(shell_get_value "id")
 SHELL_GET_GID=$(shell_get_value "otherid")
 
 GLOBAL_INTEGER_LEFTX=$CONFIG_WMS_DEFAULTLEFTX
-GLOBAL_INTEGER_TOPY=$CONFIG_WMS_DEFAULTTOPY
+GLOBAL_INTEGER_BOTTOMY=$CONFIG_WMS_DEFAULTBOTTOMY
 
 SHELLGET_INTEGER_ZOOMLEVEL=$CONFIG_WMS_DEFAULTZOOMLEVEL
 
@@ -130,7 +130,7 @@ echo "
 // ### HTML script: set variables from HTML GET ###
 
 var global_integer_leftx=$GLOBAL_INTEGER_LEFTX;
-var global_integer_topy=$GLOBAL_INTEGER_TOPY;"
+var global_integer_bottomy=$GLOBAL_INTEGER_BOTTOMY;"
 
 ### HTML script: calculate variables ###
 
@@ -205,40 +205,56 @@ function mapimage_checky()
   return;
  }
 
- if ( global_integer_topy < global_integer_minimumy )
+ if ( global_integer_bottomy < global_integer_minimumy )
  {
-  global_integer_topy=global_integer_minimumy;
+  global_integer_bottomy=global_integer_minimumy;
   return;
  }
 
  local_integer_maximumy=global_integer_maximumy - global_integer_zoomheight;
 
- if ( local_integer_maximumy < global_integer_topy )
+ if ( local_integer_maximumy < global_integer_bottomy )
  {
-  global_integer_topy=local_integer_maximumy;
+  global_integer_bottomy=local_integer_maximumy;
   return;
  }
 }
 
+function mapimage_calculatezoomwidth()
+{
+ global_integer_zoomwidth=Math.round(global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+}
+
+function mapimage_calculatezoomheight()
+{
+ global_integer_zoomheight=Math.round(global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+}
+
+function mapimage_calculatemove()
+{
+ global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
+ global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+}
 
 function mapimage_calculatecoordinate(parameter_integer_x, parameter_integer_y)
 {
  var local_real_ratiox;
  var local_real_ratioy;
 
- local_real_ratiox=document.getElementById('mapimage').width / parameter_integer_x;
- local_real_ratioy=document.getElementById('mapimage').height / parameter_integer_y;
+ local_real_ratiox=parameter_integer_x / document.getElementById('mapimage').width;
+ local_real_ratioy=(document.getElementById('mapimage').height - parameter_integer_y) / document.getElementById('mapimage').height;
 
  global_integer_leftx=global_integer_leftx + Math.round(local_real_ratiox * global_integer_zoomwidth);
- global_integer_topy=global_integer_topy + Math.round(local_real_ratioy * global_integer_zoomheight);
+ global_integer_bottomy=global_integer_bottomy + Math.round(local_real_ratioy * global_integer_zoomheight);
 }
 
 function mapimage_setsrc()
 {
- global_block_zoompan=true;
+ global_boolean_blockpanzoom=true;
 
-alert('$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&topy=' + global_integer_topy);
- document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&topy=' + global_integer_topy;
+ parent.popupiframes_hide();
+//alert('$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy);
+ document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy;
 }
 
 function mapimage_pandelta()
@@ -304,104 +320,76 @@ echo "
 
 function mapimage_zoomin()
 {
- var local_real_zoominwidth;
- var local_real_zoominheight;
+ var local_integer_zoomwidth;
+ var local_integer_zoomheight;
 
  if ( global_integer_zoomlevelmaximum <= global_integer_zoomlevel )
  {
   return;
  }
 
+ local_integer_zoomwidth=global_integer_zoomwidth;
+ local_integer_zoomheight=global_integer_zoomheight;
+
  global_integer_zoomlevel++;
 
- local_real_zoominwidth=global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
- local_real_zoominheight=global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
+ mapimage_calculatezoomwidth();
+ mapimage_calculatezoomheight();
 
- global_integer_leftx=Math.round(global_integer_leftx + ( (global_integer_zoomwidth - local_real_zoominwidth) / 2 ));
- global_integer_topy=Math.round(global_integer_topy + ( (global_integer_zoomheight - local_real_zoominheight) / 2 ));
+ global_integer_leftx=Math.round(global_integer_leftx + ( (local_integer_zoomwidth - global_integer_zoomwidth) / 2 ));
+ global_integer_bottomy=Math.round(global_integer_bottomy + ( (local_integer_zoomheight - global_integer_zoomheight) / 2 ));
 
- global_integer_zoomwidth=Math.round(local_real_zoominwidth);
- global_integer_zoomheight=Math.round(local_real_zoominheight);
- global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
- global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+ mapimage_calculatemove();
 
  mapimage_setsrc();
 }
 
 function mapimage_zoomincoordinate(parameter_integer_x, parameter_integer_y)
 {
- var local_real_zoominwidth;
- var local_real_zoominheight;
-
  if ( global_integer_zoomlevelmaximum <= global_integer_zoomlevel )
  {
   return;
  }
 
- global_integer_zoomlevel++;
-
  mapimage_calculatecoordinate(parameter_integer_x, parameter_integer_y);
 
- local_real_zoominwidth=global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
- local_real_zoominheight=global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
+ global_integer_zoomlevel++;
 
- global_integer_zoomwidth=Math.round(local_real_zoominwidth);
- global_integer_zoomheight=Math.round(local_real_zoominheight);
- global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
- global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+ mapimage_calculatezoomwidth();
+ mapimage_calculatezoomheight();
 
- mapimage_setsrc();
-}
+ global_integer_leftx=global_integer_leftx - Math.round(global_integer_zoomwidth / 2);
+ global_integer_bottomy=global_integer_bottomy - Math.round(global_integer_zoomheight / 2);
 
-function mapimage_zoomout()
-{
- var local_real_zoomoutwidth;
- var local_real_zoomoutheight;
-
- if ( global_integer_zoomlevel <= global_integer_zoomlevelminimum )
- {
-  return;
- }
-
- global_integer_zoomlevel--;
-
- local_real_zoomoutwidth=global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
- local_real_zoomoutheight=global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
-
- global_integer_leftx=Math.round(global_integer_leftx - ( (local_real_zoomoutwidth - global_integer_zoomwidth) / 2 ));
- global_integer_topy=Math.round(global_integer_topy - ( (local_real_zoomoutheight - global_integer_zoomheight) / 2 ));
-
- global_integer_zoomwidth=Math.round(local_real_zoomoutwidth);
- global_integer_zoomheight=Math.round(local_real_zoomoutheight);
- global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
- global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+ mapimage_calculatemove();
 
  mapimage_checkx();
  mapimage_checky();
  mapimage_setsrc();
 }
 
-function mapimage_zoomoutcoordinate(parameter_integer_x, parameter_integer_y)
+function mapimage_zoomout()
 {
- var local_real_zoomoutwidth;
- var local_real_zoomoutheight;
+ var local_integer_zoomwidth;
+ var local_integer_zoomheight;
 
  if ( global_integer_zoomlevel <= global_integer_zoomlevelminimum )
  {
   return;
  }
 
+ local_integer_zoomwidth=global_integer_zoomwidth;
+ local_integer_zoomheight=global_integer_zoomheight;
+
  global_integer_zoomlevel--;
 
- mapimage_calculatecoordinate(parameter_integer_x, parameter_integer_y);
+ mapimage_calculatezoomwidth();
+ mapimage_calculatezoomheight();
 
- local_real_zoomoutwidth=global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
- local_real_zoomoutheight=global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare;
+ global_integer_leftx=Math.round(global_integer_leftx - ( (global_integer_zoomwidth - local_integer_zoomwidth) / 2 ));
+ global_integer_bottomy=Math.round(global_integer_bottomy - ( (global_integer_zoomheight - local_integer_zoomheight) / 2 ));
 
- global_integer_zoomwidth=Math.round(local_real_zoomoutwidth);
- global_integer_zoomheight=Math.round(local_real_zoomoutheight);
- global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
- global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+ mapimage_calculatemove();
 
  mapimage_checkx();
  mapimage_checky();
@@ -458,19 +446,19 @@ function mapimage_panup()
 
  local_integer_maximumy=global_integer_maximumy - global_integer_zoomheight;
 
- if ( global_integer_topy == local_integer_maximumy )
+ if ( global_integer_bottomy == local_integer_maximumy )
  {
   return;
  }
 
- if ( global_integer_topy < local_integer_maximumy )
+ if ( global_integer_bottomy < local_integer_maximumy )
  {
-  global_integer_topy+=global_integer_movey;
+  global_integer_bottomy+=global_integer_movey;
  }
 
- if ( local_integer_maximumy < global_integer_topy )
+ if ( local_integer_maximumy < global_integer_bottomy )
  {
-  global_integer_topy=local_integer_maximumy;
+  global_integer_bottomy=local_integer_maximumy;
  }
 
  mapimage_setsrc();
@@ -478,19 +466,19 @@ function mapimage_panup()
 
 function mapimage_pandown()
 {
- if ( global_integer_topy == global_integer_minimumy )
+ if ( global_integer_bottomy == global_integer_minimumy )
  {
   return;
  }
 
- if ( global_integer_minimumy < global_integer_topy )
+ if ( global_integer_minimumy < global_integer_bottomy )
  {
-  global_integer_topy-=global_integer_movey;
+  global_integer_bottomy-=global_integer_movey;
  }
 
- if ( global_integer_topy < global_integer_minimumy )
+ if ( global_integer_bottomy < global_integer_minimumy )
  {
-  global_integer_topy=global_integer_minimumy;
+  global_integer_bottomy=global_integer_minimumy;
  }
 
  mapimage_setsrc();
@@ -506,8 +494,8 @@ echo "
 
 function mapimage_onload()
 {
- global_block_zoompan=false;
- wms_hideflowframes();
+ global_boolean_blockpanzoom=false;
+// wms_hideflowframes();
 }
 
 function mapimage_onkeyup(parameter_object_event)
@@ -533,6 +521,8 @@ function mapimage_onkeyup(parameter_object_event)
 
 function mapimage_onwheel(object, event)
 {
+ var local_integer_clientX;
+ var local_integer_clientY;
  var local_integer_wheeldelta;
 
  if (global_boolean_blockpanzoom)
@@ -556,11 +546,14 @@ function mapimage_onwheel(object, event)
 
  if ( local_integer_wheeldelta >= 0 )
  {
-  mapimage_zoomincoordinate(event.clientX, event.clientY);
+  local_integer_clientX=event.clientX-document.getElementById('mapimage').x;
+  local_integer_clientY=event.clientY-document.getElementById('mapimage').y;
+
+  mapimage_zoomincoordinate(local_integer_clientX, event.clientY);
  }
  else
  {
-  mapimage_zoomoutcoordinate(event.clientX, event.clientY);
+  mapimage_zoomout();
  }
 }
 
