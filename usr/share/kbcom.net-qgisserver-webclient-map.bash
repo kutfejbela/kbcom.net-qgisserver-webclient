@@ -63,24 +63,20 @@ then
  GLOBAL_ZOOMLEVEL="$CONFIG_WMS_DEFAULTZOOMLEVEL"
 fi
 
+GLOBAL_INTEGER_LEFTX=583100;
+GLOBAL_INTEGER_BOTTOMY=75700;
+
 ### HTML tags: mapimage, map help and map legend ###
 
 echo "
 <!-- HTML tags: mapimage, map help and map legend -->
 
-<img tabindex='0' id='mapimage' draggable='false'"
-
-if [ -z "$CONFIG_WMS_IMAGEWIDTH" ]
-then
- echo -n " width='100%'"
-else
- echo -n " width='$CONFIG_WMS_IMAGEWIDTH'"
-fi
-
-echo " height='$CONFIG_WMS_IMAGEHEIGHT'
+<img tabindex='0' id='mapimage' draggable='false'
+ width='100%' height='$CONFIG_WMS_IMAGEHEIGHT'
  style='display: block; margin: 0 auto; padding: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
- onload='mapimage_onload();' onkeyup='mapimage_onkeyup(event);'
- ondragstart='return false;' onwheel='mapimage_onwheel(this, event); return false;' onmousedown='mapimage_onmousedown(this, event);' onmouseup='mapimage_onmouseup(this, event);' onmouseleave='mapimage_onmouseleave(this, event);'
+ onload='mapimage_onload();' onkeyup='mapimage_onkeyup(event); return false;'
+ ondragstart='return false;' onwheel='mapimage_onwheel(event); return false;'
+ onmousedown='mapimage_onmousedown(event);' onmousemove='mapimage_onmousemove(event);' onmouseup='mapimage_onmouseup(event);' onmouseleave='mapimage_onmouseleave(event);'
  ><br>
 
 <span class='map-help'>$CONFIG_MAP_HELPHTML</span>
@@ -92,10 +88,10 @@ echo "
 <!-- HTML script -->
 <script>"
 
-### HTML script: set variables and image size (if necessary) from config ###
+### HTML script: set variables from config ###
 
 echo "
-// ### HTML script: set variables and image size (if necessary) from config ###
+// ### HTML script: set variables from config ###
 
 document.getElementById('mapimage').addEventListener('wheel', function(){
  mapimage_onwheel(this, event);
@@ -107,22 +103,20 @@ var global_integer_maximumx=$CONFIG_WMS_MAXIMUMX;
 var global_integer_minimumy=$CONFIG_WMS_MINIMUMY;
 var global_integer_maximumy=$CONFIG_WMS_MAXIMUMY;
 
-var global_integer_defaultwidth=$CONFIG_WMS_DEFAULTWIDTH;
-var global_integer_defaultheight=$CONFIG_WMS_DEFAULTHEIGHT;
+var global_integer_centerx=$CONFIG_WMS_DEFAULTCENTERX;
+var global_integer_centery=$CONFIG_WMS_DEFAULTCENTERY;
 
 var global_integer_zoomlevel=$SHELLGET_INTEGER_ZOOMLEVEL;
 var global_integer_zoomlevelminimum=$CONFIG_WMS_ZOOMLEVELMINIMUM;
-var global_integer_zoomlevelmaximum=$CONFIG_WMS_ZOOMLEVELMAXIMUM;"
+var global_integer_zoomlevelmaximum=$CONFIG_WMS_ZOOMLEVELMAXIMUM;
 
-if [ -z "$CONFIG_WMS_IMAGEWIDTH" ]
-then
- echo "
-if ( $CONFIG_WMS_IMAGEMAXWIDTH < document.getElementById('mapimage').width )
+var global_integer_imagemaximumwidth=$CONFIG_WMS_IMAGEMAXIMUMWIDTH;
+var global_integer_imagefullwidth=$CONFIG_WMS_IMAGEFULLWIDTH;
+
+if (document.getElementById('mapimage').width < global_integer_imagefullwidth)
 {
- document.getElementById('mapimage').style.width=$CONFIG_WMS_IMAGEMAXWIDTH;
- document.getElementById('mapimage').style.margin='0 auto';
+ global_integer_imagefullwidth=document.getElementById('mapimage').width;
 }"
-fi
 
 ### HTML script: set variables from HTML GET ###
 
@@ -137,32 +131,47 @@ var global_integer_bottomy=$GLOBAL_INTEGER_BOTTOMY;"
 echo "
 // ### HTML script: calculate variables ###
 
-var global_integer_maxwidth=global_integer_maximumx - global_integer_minimumx;
-var global_integer_maxheight=global_integer_maximumy - global_integer_minimumy;
+var global_integer_maximumwidth=global_integer_maximumx - global_integer_minimumx;
+var global_integer_maximumheight=global_integer_maximumy - global_integer_minimumy;
+var global_integer_fullwidth=Math.round((global_integer_imagefullwidth / global_integer_imagemaximumwidth) * global_integer_maximumwidth);
 
 var global_real_zoomlevelstepsquare=Math.pow($CONFIG_WMS_ZOOMLEVELSTEP, 2);
-var global_real_movepercentage=$CONFIG_WMS_MOVEPERCENTAGE/100;
+var global_real_movepercentage=$CONFIG_WMS_MOVEPERCENTAGE/100;"
 
-var global_integer_zoomwidth=Math.round(global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
-var global_integer_zoomheight=Math.round(global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+### HTML script: other variables ###
 
-var global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
-var global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+echo "
+// ### HTML script: other variables ###
 
-//var global_real_wmsaspectratio=global_real_width / global_real_height;
-//var global_real_imageaspectratio=document.getElementById('mapimage').width / document.getElementById('mapimage').height;"
+var global_boolean_blockpanzoom=false;
+var global_boolean_blockzoom=false;
+var global_boolean_clicking=false;
+var global_boolean_panning=false;
+
+var global_boolean_doresize=false;
+
+var global_integer_imagewidth;
+
+var global_integer_zoomwidth;
+var global_integer_zoomheight;
+
+var global_integer_movex;
+var global_integer_movey;
+var global_integer_movemaximumx;
+var global_integer_movemaximumy;
+
+var global_interval_panning;
+
+var global_integer_panningstartx;
+var global_integer_panningstarty;
+var global_integer_panningx;
+var global_integer_panningy;"
 
 ### HTML script: set other variables ###
 
 echo "
 // ### HTML script: set other variables ###
 
-var global_boolean_blockpanzoom=false;
-var global_boolean_blockzoom=false;
-
-//var global_drag_startx=0;
-//var global_drag_starty=0;
-//var global_is_dragdrop=false;
 //var global_drag_interval;"
 
 ### HTML script: calculate zoom and show mapimage ###
@@ -170,13 +179,19 @@ var global_boolean_blockzoom=false;
 echo "
 // ### HTML script: calculate zoom and show mapimage ###
 
+mapimage_calculatehorizontal();
+mapimage_calculatevertical();
+
+mapimage_calculatemove();
+
+global_boolean_doresize=true;
 mapimage_setsrc();
 
 function mapimage_checkx()
 {
  var local_integer_maximumx;
 
- if (global_integer_zoomwidth > global_integer_maxwidth)
+ if (global_integer_zoomwidth > global_integer_maximumwidth)
  {
   return;
  }
@@ -200,7 +215,7 @@ function mapimage_checky()
 {
  var local_integer_maximumy;
 
- if (global_integer_zoomheight > global_integer_maxheight)
+ if (global_integer_zoomheight > global_integer_maximumheight)
  {
   return;
  }
@@ -220,20 +235,42 @@ function mapimage_checky()
  }
 }
 
-function mapimage_calculatezoomwidth()
+function mapimage_calculatehorizontal()
 {
- global_integer_zoomwidth=Math.round(global_integer_defaultwidth / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+ var local_integer_imagemaximumwidth;
+ var local_integer_maximumzoomwidth;
+ var local_integer_zoomwidth;
+
+ local_integer_imagemaximumwidth=Math.round(global_integer_imagemaximumwidth * Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+
+ if ( local_integer_imagemaximumwidth <= global_integer_imagefullwidth )
+ {
+  global_integer_imagewidth=local_integer_imagemaximumwidth;
+  global_integer_zoomwidth=global_integer_maximumwidth;
+  global_integer_leftx=global_integer_minimumx;
+
+  return;
+ }
+
+ local_integer_maximumzoomwidth=Math.round(global_integer_maximumwidth / (Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare));
+
+ global_integer_imagewidth=global_integer_imagefullwidth;
+ global_integer_zoomwidth=(global_integer_imagewidth / global_integer_imagemaximumwidth) * local_integer_maximumzoomwidth;
+ global_integer_leftx=Math.round(global_integer_centerx - (global_integer_zoomwidth / 2));
 }
 
-function mapimage_calculatezoomheight()
+function mapimage_calculatevertical()
 {
- global_integer_zoomheight=Math.round(global_integer_defaultheight / Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+ global_integer_zoomheight=Math.round(global_integer_maximumheight / (Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare));
+ global_integer_bottomy=Math.round(global_integer_centery - (global_integer_zoomheight / 2));
 }
 
 function mapimage_calculatemove()
 {
  global_integer_movex=Math.round(global_integer_zoomwidth * global_real_movepercentage);
  global_integer_movey=Math.round(global_integer_zoomheight * global_real_movepercentage);
+ global_integer_movemaximumx=global_integer_maximumx - global_integer_zoomwidth;
+ global_integer_movemaximumy=global_integer_maximumy - global_integer_zoomheight;
 }
 
 function mapimage_calculatecoordinate(parameter_integer_x, parameter_integer_y)
@@ -244,8 +281,14 @@ function mapimage_calculatecoordinate(parameter_integer_x, parameter_integer_y)
  local_real_ratiox=parameter_integer_x / document.getElementById('mapimage').width;
  local_real_ratioy=(document.getElementById('mapimage').height - parameter_integer_y) / document.getElementById('mapimage').height;
 
- global_integer_leftx=global_integer_leftx + Math.round(local_real_ratiox * global_integer_zoomwidth);
- global_integer_bottomy=global_integer_bottomy + Math.round(local_real_ratioy * global_integer_zoomheight);
+ global_integer_centerx=global_integer_leftx + Math.round(local_real_ratiox * global_integer_zoomwidth);
+ global_integer_centery=global_integer_bottomy + Math.round(local_real_ratioy * global_integer_zoomheight);
+}
+
+function mapimage_resize()
+{
+ document.getElementById('mapimage').style.width=global_integer_imagewidth;
+ document.getElementById('mapimage').style.margin='0 auto';
 }
 
 function mapimage_setsrc()
@@ -253,49 +296,9 @@ function mapimage_setsrc()
  global_boolean_blockpanzoom=true;
 
  parent.popupiframes_hide();
-//alert('$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy);
- document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy;
+//alert('$GLOBAL_URL?module=mapimage&mapimagewidth=' + global_integer_imagewidth + '&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy);
+ document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&mapimagewidth=' + global_integer_imagewidth + '&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy;
 }
-
-function mapimage_pandelta()
-{
- if ( global_zoom_centery <= global_centery_min )
- {
-  global_centery=global_centery_min;
- }
- else
- {
-  global_centery=global_zoom_centery;
- }
-
- if ( global_centery_max <= global_zoom_centery )
- {
-  global_centery=global_centery_max;
- }
- else
- {
-  global_centery=global_zoom_centery;
- }
-
- if ( global_zoom_centerx <= global_centerx_min )
- {
-  global_centerx=global_centerx_min;
- }
- else
- {
-  global_centerx=global_zoom_centerx;
- }
-
- if ( global_centerx_max <= global_zoom_centerx )
- {
-  global_centerx=global_centery_max;
- }
- else
- {
-  global_centerx=global_zoom_centerx;
- }
-}
-
 
 function mapimage_click(object, event)
 {
@@ -320,27 +323,21 @@ echo "
 
 function mapimage_zoomin()
 {
- var local_integer_zoomwidth;
- var local_integer_zoomheight;
-
  if ( global_integer_zoomlevelmaximum <= global_integer_zoomlevel )
  {
   return;
  }
 
- local_integer_zoomwidth=global_integer_zoomwidth;
- local_integer_zoomheight=global_integer_zoomheight;
+ global_integer_centerx=Math.round(global_integer_leftx + (global_integer_zoomwidth / 2));
+ global_integer_centery=Math.round(global_integer_bottomy + (global_integer_zoomheight / 2));
 
  global_integer_zoomlevel++;
 
- mapimage_calculatezoomwidth();
- mapimage_calculatezoomheight();
-
- global_integer_leftx=Math.round(global_integer_leftx + ( (local_integer_zoomwidth - global_integer_zoomwidth) / 2 ));
- global_integer_bottomy=Math.round(global_integer_bottomy + ( (local_integer_zoomheight - global_integer_zoomheight) / 2 ));
-
+ mapimage_calculatehorizontal();
+ mapimage_calculatevertical();
  mapimage_calculatemove();
 
+ global_boolean_doresize=true;
  mapimage_setsrc();
 }
 
@@ -355,44 +352,37 @@ function mapimage_zoomincoordinate(parameter_integer_x, parameter_integer_y)
 
  global_integer_zoomlevel++;
 
- mapimage_calculatezoomwidth();
- mapimage_calculatezoomheight();
-
- global_integer_leftx=global_integer_leftx - Math.round(global_integer_zoomwidth / 2);
- global_integer_bottomy=global_integer_bottomy - Math.round(global_integer_zoomheight / 2);
-
+ mapimage_calculatehorizontal();
+ mapimage_calculatevertical();
  mapimage_calculatemove();
 
  mapimage_checkx();
  mapimage_checky();
+
+ global_boolean_doresize=true;
  mapimage_setsrc();
 }
 
 function mapimage_zoomout()
 {
- var local_integer_zoomwidth;
- var local_integer_zoomheight;
-
  if ( global_integer_zoomlevel <= global_integer_zoomlevelminimum )
  {
   return;
  }
 
- local_integer_zoomwidth=global_integer_zoomwidth;
- local_integer_zoomheight=global_integer_zoomheight;
+ global_integer_centerx=Math.round(global_integer_leftx + (global_integer_zoomwidth / 2));
+ global_integer_centery=Math.round(global_integer_bottomy + (global_integer_zoomheight / 2));
 
  global_integer_zoomlevel--;
 
- mapimage_calculatezoomwidth();
- mapimage_calculatezoomheight();
-
- global_integer_leftx=Math.round(global_integer_leftx - ( (global_integer_zoomwidth - local_integer_zoomwidth) / 2 ));
- global_integer_bottomy=Math.round(global_integer_bottomy - ( (global_integer_zoomheight - local_integer_zoomheight) / 2 ));
-
+ mapimage_calculatehorizontal();
+ mapimage_calculatevertical();
  mapimage_calculatemove();
 
  mapimage_checkx();
  mapimage_checky();
+
+ global_boolean_doresize=true;
  mapimage_setsrc();
 }
 
@@ -403,63 +393,31 @@ function mapimage_panleft()
   return;
  }
 
- if ( global_integer_minimumx < global_integer_leftx )
- {
-  global_integer_leftx-=global_integer_movex;
- }
-
- if ( global_integer_leftx < global_integer_minimumx )
- {
-  global_integer_leftx=global_integer_minimumx;
- }
+ mapimage_pandelta(-global_integer_movex, 0);
 
  mapimage_setsrc();
 }
 
 function mapimage_panright()
 {
- var local_integer_maximumx;
-
- local_integer_maximumx=global_integer_maximumx - global_integer_zoomwidth;
-
- if ( global_integer_leftx == local_integer_maximumx )
+ if ( global_integer_leftx == global_integer_movemaximumx )
  {
   return;
  }
 
- if ( global_integer_leftx < local_integer_maximumx )
- {
-  global_integer_leftx+=global_integer_movex;
- }
-
- if ( local_integer_maximumx < global_integer_leftx )
- {
-  global_integer_leftx=local_integer_maximumx;
- }
+ mapimage_pandelta(global_integer_movex, 0);
 
  mapimage_setsrc();
 }
 
 function mapimage_panup()
 {
- var local_integer_maximumy;
-
- local_integer_maximumy=global_integer_maximumy - global_integer_zoomheight;
-
- if ( global_integer_bottomy == local_integer_maximumy )
+ if ( global_integer_bottomy == global_integer_movemaximumy )
  {
   return;
  }
 
- if ( global_integer_bottomy < local_integer_maximumy )
- {
-  global_integer_bottomy+=global_integer_movey;
- }
-
- if ( local_integer_maximumy < global_integer_bottomy )
- {
-  global_integer_bottomy=local_integer_maximumy;
- }
+ mapimage_pandelta(0, global_integer_movey);
 
  mapimage_setsrc();
 }
@@ -471,21 +429,95 @@ function mapimage_pandown()
   return;
  }
 
- if ( global_integer_minimumy < global_integer_bottomy )
+ mapimage_pandelta(0, -global_integer_movey);
+
+ mapimage_setsrc();
+}
+
+function mapimage_pandelta(parameter_integer_deltax, parameter_integer_deltay)
+{
+ if (parameter_integer_deltax < 0)
  {
-  global_integer_bottomy-=global_integer_movey;
+  if ( global_integer_minimumx < global_integer_leftx )
+  {
+   global_integer_leftx+=parameter_integer_deltax;
+  }
+
+  if ( global_integer_leftx < global_integer_minimumx )
+  {
+   global_integer_leftx=global_integer_minimumx;
+  }
  }
 
- if ( global_integer_bottomy < global_integer_minimumy )
+ if (0 < parameter_integer_deltax)
  {
-  global_integer_bottomy=global_integer_minimumy;
+  if ( global_integer_leftx < global_integer_movemaximumx )
+  {
+   global_integer_leftx+=parameter_integer_deltax;
+  }
+
+  if ( global_integer_movemaximumx < global_integer_leftx )
+  {
+   global_integer_leftx=global_integer_movemaximumx;
+  }
  }
+
+ if (parameter_integer_deltay < 0)
+ {
+  if ( global_integer_minimumy < global_integer_bottomy )
+  {
+   global_integer_bottomy+=parameter_integer_deltay;
+  }
+
+  if ( global_integer_bottomy < global_integer_minimumy )
+  {
+   global_integer_bottomy=global_integer_minimumy;
+  }
+ }
+
+ if (0 < parameter_integer_deltay)
+ {
+
+  if ( global_integer_bottomy < global_integer_movemaximumy )
+  {
+   global_integer_bottomy+=parameter_integer_deltay;
+  }
+
+  if ( global_integer_movemaximumy < global_integer_bottomy )
+  {
+   global_integer_bottomy=global_integer_movemaximumy;
+  }
+ }
+}
+
+function mapimage_panning()
+{
+ var local_integer_deltax;
+ var local_integer_deltay;
+
+ if (global_integer_panningstartx == global_integer_panningx && global_integer_panningstarty == global_integer_panningy)
+ {
+  return;
+ }
+
+ clearInterval(global_interval_panning);
+
+ local_integer_deltax=global_integer_panningx - global_integer_panningstartx;
+ local_integer_deltay=global_integer_panningy - global_integer_panningstarty;
+
+ global_integer_panningstartx=global_integer_panningx;
+ global_integer_panningstarty=global_integer_panningy;
+
+ local_integer_movex=Math.round((local_integer_deltax / document.getElementById('mapimage').width) * global_integer_zoomwidth);
+ local_integer_movey=Math.round((local_integer_deltay / document.getElementById('mapimage').height) * global_integer_zoomheight);
+
+ mapimage_pandelta(-local_integer_movex, local_integer_movey);
+
+ mapimage_checkx();
+ mapimage_checky();
 
  mapimage_setsrc();
 }"
-
-
-
 
 ### HTML script: mapimage events ###
 
@@ -495,7 +527,18 @@ echo "
 function mapimage_onload()
 {
  global_boolean_blockpanzoom=false;
-// wms_hideflowframes();
+
+ if (global_boolean_doresize)
+ {
+  mapimage_resize();
+ }
+
+ if (global_boolean_panning)
+ {
+  global_interval_panning=setInterval(mapimage_panning, $CONFIG_WMS_PANINTERVAL);
+ }
+
+ parent.popupiframes_hide();
 }
 
 function mapimage_onkeyup(parameter_object_event)
@@ -505,25 +548,27 @@ function mapimage_onkeyup(parameter_object_event)
   return;
  }
 
- if (event.which == 37) mapimage_panleft();
- if (event.which == 38) mapimage_panup();
- if (event.which == 39) mapimage_panright();
- if (event.which == 40) mapimage_pandown();
+ if (parameter_object_event.which == 37) mapimage_panleft();
+ if (parameter_object_event.which == 38) mapimage_panup();
+ if (parameter_object_event.which == 39) mapimage_panright();
+ if (parameter_object_event.which == 40) mapimage_pandown();
 
  if (global_boolean_blockzoom)
  {
   return;
  }
 
- if (event.which == 107) mapimage_zoomin();
- if (event.which == 109) mapimage_zoomout();
+ if (parameter_object_event.which == 107) mapimage_zoomin();
+ if (parameter_object_event.which == 109) mapimage_zoomout();
 }
 
-function mapimage_onwheel(object, event)
+function mapimage_onwheel(parameter_object_event)
 {
- var local_integer_clientX;
- var local_integer_clientY;
  var local_integer_wheeldelta;
+ var local_integer_clientx;
+ var local_integer_clienty;
+
+ document.getElementById('mapimage').focus();
 
  if (global_boolean_blockpanzoom)
  {
@@ -535,21 +580,21 @@ function mapimage_onwheel(object, event)
   return;
  }
 
- if ( event.wheelDelta )
+ if ( parameter_object_event.wheelDelta )
  {
-  local_integer_wheeldelta=event.wheelDelta;
+  local_integer_wheeldelta=parameter_object_event.wheelDelta;
  }
  else
  {
-  local_integer_wheeldelta=-event.deltaY;
+  local_integer_wheeldelta=-parameter_object_event.deltaY;
  }
 
  if ( local_integer_wheeldelta >= 0 )
  {
-  local_integer_clientX=event.clientX-document.getElementById('mapimage').x;
-  local_integer_clientY=event.clientY-document.getElementById('mapimage').y;
+  local_integer_clientx=parameter_object_event.clientX - document.getElementById('mapimage').x;
+  local_integer_clienty=parameter_object_event.clientY - document.getElementById('mapimage').y;
 
-  mapimage_zoomincoordinate(local_integer_clientX, event.clientY);
+  mapimage_zoomincoordinate(local_integer_clientx, local_integer_clienty);
  }
  else
  {
@@ -557,81 +602,82 @@ function mapimage_onwheel(object, event)
  }
 }
 
-</script>"
-
-echo "<script>
-function mapimage_onmousedown(object, event)
+function mapimage_onmousedown(parameter_object_event)
 {
- if (global_block_zoompan)
+ if (global_boolean_blockpanzoom)
  {
   return;
  }
 
- wms_hideflowframes();
+ parent.popupiframes_hide();
 
- global_drag_startx=event.clientX;
- global_drag_starty=event.clientY;
- global_is_dragdrop=true;
+ global_integer_panningstartx=parameter_object_event.clientX;
+ global_integer_panningstarty=parameter_object_event.clientY;
 
-// var e = window.event;
-// var local_x = e.clientX;
-// var local_y = e.clientY;
-// global_drag_interval=setIntreval(wms_drag_showmap, 1000);
+ global_boolean_clicking=true;
+ global_boolean_blockzoom=true;
+
+ global_interval_panning=setInterval(mapimage_panning, $CONFIG_WMS_PANINTERVAL);
 }
 
-</script>"
-
-echo "<script>
-function mapimage_onmouseup(object, event)
+function mapimage_onmousemove(parameter_object_event)
 {
- if (global_block_zoompan)
+ if (!global_boolean_clicking)
  {
   return;
  }
 
- global_is_dragdrop=false;
+ global_boolean_panning=true;
 
- var local_deltaX=event.clientX-global_drag_startx;
- var local_deltaY=event.clientY-global_drag_starty;
-
- if (local_deltaX == 0 && local_deltaY == 0)
- {
-  mapimage_click(object, event);
-  return;
- }
-
- global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGEWIDTH})*(global_width/global_zoom_widthrate));
- global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGEHEIGHT})*(global_height/global_zoom_heightrate));
-
- wms_movecenter();
- wms_showmap();
+ global_integer_panningx=parameter_object_event.clientX;
+ global_integer_panningy=parameter_object_event.clientY;
 }
 
-</script>"
-
-echo "<script>
-function mapimage_onmouseleave(object, event)
+function mapimage_onmouseup(parameter_object_event)
 {
- if (global_block_zoompan)
+ if (!global_boolean_clicking)
  {
   return;
  }
 
- if ( ! global_is_dragdrop )
+ clearInterval(global_interval_panning);
+
+ global_boolean_clicking=false;
+ global_boolean_blockzoom=false;
+
+ if (global_boolean_panning)
  {
-  return false;
+  global_boolean_panning=false;
+
+  global_integer_panningx=parameter_object_event.clientX;
+  global_integer_panningy=parameter_object_event.clientY;
+
+  mapimage_panning();
+ }
+ else
+ {
+alert('click');
+  return;
+ }
+}
+
+function mapimage_onmouseleave(parameter_object_event)
+{
+ if (!global_boolean_panning)
+ {
+  return;
  }
 
- global_is_dragdrop=false;
+ clearInterval(global_interval_panning);
 
- var local_deltaX=event.clientX-global_drag_startx;
- var local_deltaY=event.clientY-global_drag_starty;
+ global_boolean_clicking=false;
+ global_boolean_panning=false;
+ global_boolean_blockzoom=false;
 
- global_zoom_centerx=global_centerx-Math.floor((local_deltaX/${CONFIG_WMS_MAPIMAGEWIDTH})*(global_width/global_zoom_widthrate));
- global_zoom_centery=global_centery+Math.floor((local_deltaY/${CONFIG_WMS_MAPIMAGEHEIGHT})*(global_height/global_zoom_heightrate));
+ global_integer_panningx=parameter_object_event.clientX;
+ global_integer_panningy=parameter_object_event.clientY;
 
- wms_movecenter();
- wms_showmap();
+ mapimage_panning();
 }
 
 </script>"
