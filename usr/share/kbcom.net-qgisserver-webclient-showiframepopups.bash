@@ -23,12 +23,12 @@ echo "
 
 function popupiframes_hide()
 {
- document.getElementById('iframe_maptip').style.width = 0;
- document.getElementById('iframe_maptip').style.height = 0;
- document.getElementById('iframe_maptip').style.visibility = 'hidden';
- document.getElementById('iframe_searchresult').style.width = 0;
- document.getElementById('iframe_searchresult').style.height = 0;
- document.getElementById('iframe_searchresult').style.visibility = 'hidden';
+ document.getElementById('iframe_maptip').style.width=0;
+ document.getElementById('iframe_maptip').style.height=0;
+ document.getElementById('iframe_maptip').style.visibility='hidden';
+ document.getElementById('iframe_searchresult').style.width=0;
+ document.getElementById('iframe_searchresult').style.height=0;
+ document.getElementById('iframe_searchresult').style.visibility='hidden';
 }
 
 </script>
@@ -43,52 +43,52 @@ echo "
 
 function iframe_searchresult_hide()
 {
- document.getElementById('iframe_searchresult').style.width = 0;
- document.getElementById('iframe_searchresult').style.height = 0;
- document.getElementById('iframe_searchresult').style.visibility = 'hidden';
+ document.getElementById('iframe_searchresult').style.width=0;
+ document.getElementById('iframe_searchresult').style.height=0;
+ document.getElementById('iframe_searchresult').style.visibility='hidden';
 }
 
-function iframe_searchresult_setposition(parameter_x, parameter_y)
+function iframe_searchresult_setposition(parameter_integer_x, parameter_integer_y)
 {
- document.getElementById('iframe_searchresult').style.left = parameter_x;
- document.getElementById('iframe_searchresult').style.top = parameter_y;
+ document.getElementById('iframe_searchresult').style.left=document.getElementById('iframe_search').offsetLeft + parameter_integer_x;
+ document.getElementById('iframe_searchresult').style.top=document.getElementById('iframe_search').offsetTop + parameter_integer_y;
 }
 
-function iframe_searchresult_setsrc(parameter_searchtext)
+function iframe_searchresult_setsrc(parameter_string_searchtext)
 {
- var local_searchtext;
+ var local_string_searchtext;
 
- local_searchtext = parameter_searchtext.replace('%','%25');
- local_searchtext = local_searchtext.replace('&','%26');
- local_searchtext = local_searchtext.replace('\t','%09');
+ local_string_searchtext=parameter_string_searchtext.replace('%','%25');
+ local_string_searchtext=local_string_searchtext.replace('&','%26');
+ local_string_searchtext=local_string_searchtext.replace('\t','%09');
 
- document.getElementById('iframe_searchresult').src='$GLOBAL_URL?module=searchresult&searchtext=' + local_searchtext;
+ document.getElementById('iframe_searchresult').src='$GLOBAL_URL?module=searchresult&searchtext=' + local_string_searchtext;
 }
 
 function iframe_searchresult_onload()
 {
- var local_iframe_searchresult_calculatedwidth = document.getElementById('iframe_searchresult').contentWindow.document.body.scrollWidth;
- var local_iframe_searchresult_calculatedheight = document.getElementById('iframe_searchresult').contentWindow.document.body.scrollHeight;
+ var local_integer_contentwidth=document.getElementById('iframe_searchresult').contentWindow.document.body.scrollWidth;
+ var local_integer_contentheight=document.getElementById('iframe_searchresult').contentWindow.document.body.scrollHeight;
 
- if ( local_iframe_searchresult_calculatedwidth <= $CONFIG_SEARCHRESULT_MINIMUMWIDTH )
+ if ( local_integer_contentwidth <= $CONFIG_SEARCHRESULT_MINIMUMWIDTH )
  {
-  document.getElementById('iframe_searchresult').style.width = $CONFIG_SEARCHRESULT_MINIMUMWIDTH;
+  document.getElementById('iframe_searchresult').style.width=$CONFIG_SEARCHRESULT_MINIMUMWIDTH;
  }
  else
  {
-  document.getElementById('iframe_searchresult').style.width = local_iframe_searchresult_calculatedwidth;
+  document.getElementById('iframe_searchresult').style.width=local_integer_contentwidth;
  }
 
- if ( $CONFIG_SEARCHRESULT_MAXIMUMHEIGHT <= local_iframe_searchresult_calculatedheight )
+ if ( $CONFIG_SEARCHRESULT_MAXIMUMHEIGHT <= local_integer_contentheight )
  {
-  document.getElementById('iframe_searchresult').style.height = $CONFIG_SEARCHRESULT_MAXIMUMHEIGHT;
+  document.getElementById('iframe_searchresult').style.height=$CONFIG_SEARCHRESULT_MAXIMUMHEIGHT;
  }
  else
  {
-  document.getElementById('iframe_searchresult').style.height = local_iframe_searchresult_calculatedheight;
+  document.getElementById('iframe_searchresult').style.height=local_integer_contentheight;
  }
 
- document.getElementById('iframe_searchresult').style.visibility = 'visible';
+ document.getElementById('iframe_searchresult').style.visibility='visible';
 }
 
 </script>
@@ -101,17 +101,22 @@ echo "
 
 <script>
 
-function iframe_maptip_setposition(parameter_x, parameter_y)
+function iframe_maptip_setposition(parameter_integer_x, parameter_integer_y)
 {
- document.getElementById('iframe_maptip').style.left = parameter_x;
- document.getElementById('iframe_maptip').style.top = parameter_y;
+ document.getElementById('iframe_maptip').style.left=document.getElementById('iframe_map').offsetLeft + parameter_integer_x;
+ document.getElementById('iframe_maptip').style.top=document.getElementById('iframe_map').offsetTop + parameter_integer_y;
+}
+
+function iframe_maptip_setsrc(parameter_integer_imagewidth, parameter_integer_zoomlevel, parameter_integer_leftx, parameter_integer_bottomy, parameter_integer_x, parameter_integer_y)
+{
+ document.getElementById('iframe_maptip').src='$GLOBAL_URL?module=maptip&mapimagewidth=' + parameter_integer_imagewidth + '&zoomlevel=' + parameter_integer_zoomlevel + '&leftx=' + parameter_integer_leftx + '&bottomy=' + parameter_integer_bottomy + '&x=' + parameter_integer_x + '&y=' + parameter_integer_y;
 }
 
 function iframe_maptip_onload()
 {
- document.getElementById('iframe_maptip').style.width = document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
- document.getElementById('iframe_maptip').style.height = document.getElementById('iframe_maptip').contentWindow.document.body.scrollHeight;
- document.getElementById('iframe_maptip').style.visibility = 'visible';
+ document.getElementById('iframe_maptip').style.width=document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
+ document.getElementById('iframe_maptip').style.height=document.getElementById('iframe_maptip').contentWindow.document.body.scrollHeight;
+ document.getElementById('iframe_maptip').style.visibility='visible';
 }
 
 </script>

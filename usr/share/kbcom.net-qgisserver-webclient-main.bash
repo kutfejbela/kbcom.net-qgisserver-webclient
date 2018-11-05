@@ -20,8 +20,8 @@ div.maincontainer { position: absolute; top: 0; bottom: 0; left: 0; right: 0; ma
 
 echo "<div id='maincontainer' class='maincontainer'>"
 
-source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showiframepopups.bash"
 source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showiframefixes.bash"
+source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showiframepopups.bash"
 
 echo "</div>"
 

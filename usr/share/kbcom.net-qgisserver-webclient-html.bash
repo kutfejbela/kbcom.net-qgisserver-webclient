@@ -15,7 +15,7 @@ $CONFIG_HTML_CSS
 </style>
 <meta charset='UTF-8'>
 </head>
-<body tabindex='-1'>
+<body tabindex='-1' onclick='parent.popupiframes_hide();'>
 "
 
 printf '\n\n<!-- HTML template processing has started (%(%c)T) -->\n'

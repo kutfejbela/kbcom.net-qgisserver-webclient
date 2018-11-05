@@ -19,10 +19,10 @@ mapimage)
 # show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-mapimg.bash"
  ;;
-wmsmaptip)
- show_header_html
- source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-showmaptip.bash"
- show_footer_html
+maptip)
+# show_header_html
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-maptip.bash"
+# show_footer_html
  ;;
 map)
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-map.bash"

@@ -15,7 +15,7 @@ $CONFIG_MAP_CSS
 </style>
 <meta charset='UTF-8'>
 </head>
-<body tabindex='-1'>
+<body tabindex='-1' onclick='parent.popupiframes_hide();'>
 "
 
 ### HTML GET id & gid ###
@@ -74,7 +74,7 @@ echo "
 <img tabindex='0' id='mapimage' draggable='false'
  width='100%' height='$CONFIG_WMS_IMAGEHEIGHT'
  style='display: block; margin: 0 auto; padding: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
- onload='mapimage_onload();' onkeyup='mapimage_onkeyup(event); return false;'
+ onload='mapimage_onload();' onkeydown='return false;' onkeyup='mapimage_onkeyup(event); return false;'
  ondragstart='return false;' onwheel='mapimage_onwheel(event); return false;'
  onmousedown='mapimage_onmousedown(event);' onmousemove='mapimage_onmousemove(event);' onmouseup='mapimage_onmouseup(event);' onmouseleave='mapimage_onmouseleave(event);'
  ><br>
@@ -255,7 +255,7 @@ function mapimage_calculatehorizontal()
  local_integer_maximumzoomwidth=Math.round(global_integer_maximumwidth / (Math.pow(global_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare));
 
  global_integer_imagewidth=global_integer_imagefullwidth;
- global_integer_zoomwidth=(global_integer_imagewidth / global_integer_imagemaximumwidth) * local_integer_maximumzoomwidth;
+ global_integer_zoomwidth=Math.round((global_integer_imagewidth / global_integer_imagemaximumwidth) * local_integer_maximumzoomwidth);
  global_integer_leftx=Math.round(global_integer_centerx - (global_integer_zoomwidth / 2));
 }
 
@@ -291,6 +291,19 @@ function mapimage_resize()
  document.getElementById('mapimage').style.margin='0 auto';
 }
 
+function mapimage_click(parameter_integer_x, parameter_integer_y)
+{
+ var local_integer_x;
+ var local_integer_y;
+
+ parent.iframe_maptip_setposition(parameter_integer_x, parameter_integer_y);
+
+ local_integer_x=parameter_integer_x - document.getElementById('mapimage').x;
+ local_integer_y=parameter_integer_y - document.getElementById('mapimage').y;
+
+ parent.iframe_maptip_setsrc(global_integer_imagewidth, global_integer_zoomlevel, global_integer_leftx, global_integer_bottomy, local_integer_x, local_integer_y)
+}
+
 function mapimage_setsrc()
 {
  global_boolean_blockpanzoom=true;
@@ -298,22 +311,6 @@ function mapimage_setsrc()
  parent.popupiframes_hide();
 //alert('$GLOBAL_URL?module=mapimage&mapimagewidth=' + global_integer_imagewidth + '&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy);
  document.getElementById('mapimage').src='$GLOBAL_URL?module=mapimage&mapimagewidth=' + global_integer_imagewidth + '&zoomlevel=' + global_integer_zoomlevel + '&leftx=' + global_integer_leftx + '&bottomy=' + global_integer_bottomy;
-}
-
-function mapimage_click(object, event)
-{
- var imgX = event.clientX - Math.floor(object.getBoundingClientRect().left);
- var imgY = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(object.getBoundingClientRect().top);
- var clickX = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft + Math.floor(parent.document.getElementById('map').getBoundingClientRect().left);
- var clickY = event.clientY + document.body.scrollTop + document.documentElement.scrollTop + parent.document.documentElement.scrollTop + Math.floor(parent.document.getElementById('map').getBoundingClientRect().top);
-
- // if ( imgX < ${CONFIG_WMS_MAPIMAGEWIDTH} ) ${CONFIG_WMS_MAPIMAGEHEIGHT}
-// parent.document.getElementById('iframe_maptip').style.left=clickX;
-// parent.document.getElementById('iframe_maptip').style.top=clickY;
-// parent.document.getElementById('iframe_maptip').style.width=0;
-// parent.document.getElementById('iframe_maptip').style.height=0;
-// parent.document.getElementById('iframe_maptip').src='$GLOBAL_URL?module=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
-// document.getElementById('mapimageurl').value='$GLOBAL_URL?module=wmsmaptip&zoomlevel=' + global_zoomlevel + '&centerx=' + global_centerx + '&centery=' + global_centery + '&x=' + imgX + '&y=' + imgY;
 }"
 
 ### HTML script: mapimage pan & zoom ###
@@ -565,8 +562,8 @@ function mapimage_onkeyup(parameter_object_event)
 function mapimage_onwheel(parameter_object_event)
 {
  var local_integer_wheeldelta;
- var local_integer_clientx;
- var local_integer_clienty;
+ var local_integer_x;
+ var local_integer_y;
 
  document.getElementById('mapimage').focus();
 
@@ -591,10 +588,10 @@ function mapimage_onwheel(parameter_object_event)
 
  if ( local_integer_wheeldelta >= 0 )
  {
-  local_integer_clientx=parameter_object_event.clientX - document.getElementById('mapimage').x;
-  local_integer_clienty=parameter_object_event.clientY - document.getElementById('mapimage').y;
+  local_integer_x=parameter_object_event.clientX - document.getElementById('mapimage').x;
+  local_integer_y=parameter_object_event.clientY - document.getElementById('mapimage').y;
 
-  mapimage_zoomincoordinate(local_integer_clientx, local_integer_clienty);
+  mapimage_zoomincoordinate(local_integer_x, local_integer_y);
  }
  else
  {
@@ -656,8 +653,7 @@ function mapimage_onmouseup(parameter_object_event)
  }
  else
  {
-alert('click');
-  return;
+  mapimage_click(parameter_object_event.clientX, parameter_object_event.clientY);
  }
 }
 

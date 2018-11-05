@@ -15,7 +15,7 @@ $CONFIG_SEARCH_CSS
 </style>
 <meta charset='UTF-8'>
 </head>
-<body tabindex='-1'>
+<body tabindex='-1' onclick='parent.popupiframes_hide();'>
 "
 
 ### SEARCH inputbox & help ###
@@ -23,7 +23,7 @@ $CONFIG_SEARCH_CSS
 echo "
 <!-- SEARCH inputbox & help -->
 
-<input tabindex='0' type='text' id='search_inputbox' placeholder='$CONFIG_SEARCH_LABELHTMLVALUE' maxlength='30' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);'><br>
+<input tabindex='0' type='text' id='search_inputbox' placeholder='$CONFIG_SEARCH_LABELHTMLVALUE' maxlength='30' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);' onfocus='search_inputbox_onkeyup(event);'><br>
 <label class='search-help'>$CONFIG_SEARCH_HELPHTML</label>
 "
 
