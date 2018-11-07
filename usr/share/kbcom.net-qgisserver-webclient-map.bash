@@ -74,7 +74,7 @@ echo "
 <img tabindex='0' id='mapimage' draggable='false'
  width='100%' height='$CONFIG_WMS_IMAGEHEIGHT'
  style='display: block; margin: 0 auto; padding: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
- onload='mapimage_onload();' onkeydown='return false;' onkeyup='mapimage_onkeyup(event); return false;'
+ onload='mapimage_onload();' onkeydown='return mapimage_onkeydown(event);' onkeyup='return mapimage_onkeyup(event);'
  ondragstart='return false;' onwheel='mapimage_onwheel(event); return false;'
  onmousedown='mapimage_onmousedown(event);' onmousemove='mapimage_onmousemove(event);' onmouseup='mapimage_onmouseup(event);' onmouseleave='mapimage_onmouseleave(event);'
  ><br>
@@ -538,25 +538,39 @@ function mapimage_onload()
  parent.popupiframes_hide();
 }
 
+function mapimage_onkeydown(parameter_object_event)
+{
+ if (parameter_object_event.which == 37) return false;
+ if (parameter_object_event.which == 38) return false;
+ if (parameter_object_event.which == 39) return false;
+ if (parameter_object_event.which == 40) return false;
+ if (parameter_object_event.which == 107) return false;
+ if (parameter_object_event.which == 109) return false;
+
+ return true;
+}
+
 function mapimage_onkeyup(parameter_object_event)
 {
  if (global_boolean_blockpanzoom)
  {
-  return;
+  return true;
  }
 
- if (parameter_object_event.which == 37) mapimage_panleft();
- if (parameter_object_event.which == 38) mapimage_panup();
- if (parameter_object_event.which == 39) mapimage_panright();
- if (parameter_object_event.which == 40) mapimage_pandown();
+ if (parameter_object_event.which == 37) { mapimage_panleft(); return false; }
+ if (parameter_object_event.which == 38) { mapimage_panup(); return false; }
+ if (parameter_object_event.which == 39) { mapimage_panright(); return false; }
+ if (parameter_object_event.which == 40) { mapimage_pandown(); return false; }
 
  if (global_boolean_blockzoom)
  {
-  return;
+  return true;
  }
 
- if (parameter_object_event.which == 107) mapimage_zoomin();
- if (parameter_object_event.which == 109) mapimage_zoomout();
+ if (parameter_object_event.which == 107) { mapimage_zoomin(); return false; }
+ if (parameter_object_event.which == 109) { mapimage_zoomout(); return false; }
+
+ return true;
 }
 
 function mapimage_onwheel(parameter_object_event)
