@@ -52,14 +52,19 @@ echo "
 "
 
 
-### MAP onload ###
+### MAP setsrc & onload ###
 
 echo "
-<!-- MAP onload -->
+<!-- MAP setsrc & onload -->
 
 <script>
 
 var global_iframe_map_sized=false;
+
+function iframe_map_setsrc(parameter_string_ids)
+{
+ document.getElementById('iframe_map').src='$GLOBAL_URL?module=map&ids=' + parameter_string_ids;
+}
 
 function iframe_map_onload()
 {
@@ -88,25 +93,14 @@ echo "
 </script>
 "
 
-### HTML onload & setpositionandsize ###
+### HTML setpositionandsize & onload ###
 
 echo "
-<!-- HTML onload & setpositionandsize -->
+<!-- HTML setpositionandsize & onload -->
 
 <script>
 
 var global_iframe_html_loaded=false;
-
-function iframe_html_onload()
-{
- if (global_iframe_html_loaded)
- {
-  return;
- }
-
- global_iframe_html_loaded=true;
- iframe_html_setpositionandsize();
-}
 
 function iframe_html_setpositionandsize()
 {
@@ -155,6 +149,17 @@ fi
 echo "
  document.getElementById('iframe_html').style.top=document.getElementById('iframe_map').getBoundingClientRect().bottom;
  document.getElementById('iframe_html').style.visibility='visible';
+}
+
+function iframe_html_onload()
+{
+ if (global_iframe_html_loaded)
+ {
+  return;
+ }
+
+ global_iframe_html_loaded=true;
+ iframe_html_setpositionandsize();
 }
 
 </script>

@@ -56,16 +56,17 @@ shell_url()
  echo $LOCAL_URL
 }
 
-check_value_integer()
+check_value_positveinteger()
 {
  local PARAMETER_STRING_INTEGERVALUE="$1"
 
  if [ ! -z "${PARAMETER_STRING_INTEGERVALUE//[0-9]}" ]
  then
+  echo false
   return
  fi
 
- echo "$PARAMETER_STRING_INTEGERVALUE"
+ echo true
 }
 
 check_value_integerbetween()
@@ -141,18 +142,20 @@ check_value_integerbetweendefault()
  echo "$PARAMETER_INTEGER_DEFAULT"
 }
 
-convert_spaceseparetedstring_sqllikestring()
+check_value_integersstring()
 {
- local PARAMETER_STRING_STRING="$1"
+ local PARAMETER_STRING_INTEGERS="$1"
 
- local LOCAL_STRING_RESULT
+ for LOCAL_INTEGER_VALUE in $PARAMETER_STRING_INTEGERS
+ do
+  if [ "$(check_value_positveinteger "$LOCAL_INTEGER_VALUE")" = false ]
+  then
+   echo false
+   return
+  fi
+ done
 
- LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING//\\/\\\\}
- LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//%/\\%}
- LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//_/\\_}
- LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT// /%}
-
- echo "$LOCAL_STRING_RESULT"
+ echo true
 }
 
 convert_escapedstring_html()
@@ -193,16 +196,17 @@ convert_datatemplate_string()
  local PARAMETER_STRING_DATATEMPLATE="$1"
  local -n PARAMETER_ROWARRAY_DATA=$2
 
+ local LOCAL_INTEGER_COLUMN
  local LOCAL_STRING_RESULT
 
- LOCAL_STRING_RESULT=""
+ LOCAL_INTEGER_COLUMN="${PARAMETER_STRING_DATATEMPLATE:1:2}"
 
- LOCAL_INTEGER_COLUMN=$(check_value_integer "${PARAMETER_STRING_DATATEMPLATE:1:2}")
-
- if [ -z "$LOCAL_INTEGER_COLUMN" ]
+ if [ "$(check_value_positiveinteger "$LOCAL_INTEGER_COLUMN")" = false ]
  then
   return
  fi
+
+ LOCAL_STRING_RESULT=""
 
  case "${PARAMETER_STRING_DATATEMPLATE:0:1}" in
   "r")
@@ -281,7 +285,14 @@ convert_real_integer()
  fi
 }
 
-calculate_bbox()
+convert_bbox_zoomlevel()
+{
+ local PARAMETER_STRING_BBOX="$1"
+
+ echo "1"
+}
+
+convert_widthzoomxy_bbox()
 {
  local PARAMETER_INTEGER_MAPIMAGEWIDTH="$1"
  local PARAMETER_INTEGER_ZOOMLEVEL="$2"
@@ -374,6 +385,78 @@ request_featureinfo_wms()
  /usr/bin/cgi-fcgi -bind -connect $CONFIG_QGISSERVER_SOCKET
 }
 
+### USE psql instead WFS ###
+# QGIS Server WFS have a problem with non US character and
+# does not support srsName and sortBy
+
+convert_spaceseparetedstring_sqllikestring()
+{
+ local PARAMETER_STRING_STRING="$1"
+
+ local LOCAL_STRING_RESULT
+
+ LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING//\\/\\\\}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//%/\\%}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT//_/\\_}
+ LOCAL_STRING_RESULT=${LOCAL_STRING_RESULT// /%}
+
+ echo "$LOCAL_STRING_RESULT"
+}
+
+convert_spaceseparetedstring_sqlwherestring()
+{
+ local PARAMETER_STRING_STRING="$1"
+
+ local LOCAL_STRING_RESULT
+
+ LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING// / OR id=}
+ LOCAL_STRING_RESULT="id=$LOCAL_STRING_RESULT"
+
+ echo "$LOCAL_STRING_RESULT"
+}
+
+request_sql_searchresult()
+{
+ local PARAMETER_STRING_SEARCHTEXT="$1"
+
+ local LOCAL_STRING_SQLLIKE
+ local LOCAL_STRING_SQLQUERY
+
+ LOCAL_STRING_SQLLIKE=$(convert_spaceseparetedstring_sqllikestring "$PARAMETER_STRING_SEARCHTEXT")
+
+ LOCAL_STRING_SQLQUERY="/usr/bin/psql -c \"
+  copy (
+   select \\\"$CONFIG_SEARCHRESULT_WFSIDFIELD\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
+   from \\\"$CONFIG_SEARCHRESULT_WFSLAYER\\\"
+   where \\\"cim\\\" ilike '%$LOCAL_STRING_SQLLIKE%'
+   order by \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
+  )
+  to stdout with delimiter as E'\\t' null as ''
+ \""
+
+ echo "$(eval $LOCAL_STRING_SQLQUERY)"
+}
+
+request_sql_geombyid()
+{
+ local PARAMETER_STRING_IDS="$1"
+
+ local LOCAL_STRING_SQLWHERE
+ local LOCAL_ROWSTING_RESULT
+
+ LOCAL_STRING_SQLWHERE=$(convert_spaceseparetedstring_sqlwherestring "$PARAMETER_STRING_IDS")
+
+ LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
+copy (
+ select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
+ from \"$CONFIG_MAPIMAGE_WFSLAYER\"
+ where $LOCAL_STRING_SQLWHERE
+)
+to stdout with delimiter as E'\t' null as ''"
+ )
+
+ echo "$LOCAL_ROWSTRING_RESULT"
+}
 
 
 
@@ -533,62 +616,3 @@ convert_mapbox_geomarray()
 
 
 
-### USE psql instead WFS ###
-# QGIS Server WFS have a problem with non US character and
-# does not support srsName and sortBy
-
-request_sql_searchresult()
-{
- local PARAMETER_STRING_SQLLIKE="$1"
-
- local LOCAL_STRING_SQLQUERY
-
- LOCAL_STRING_SQLQUERY="/usr/bin/psql -c \"
-  copy (
-   select \\\"$CONFIG_SEARCHRESULT_WFSIDFIELD\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
-   from \\\"$CONFIG_SEARCHRESULT_WFSLAYER\\\"
-   where \\\"cim\\\" ilike '%$PARAMETER_STRING_SQLLIKE%'
-   order by \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
-  )
-  to stdout with delimiter as E'\\t' null as ''
- \""
-
- echo "$(eval $LOCAL_STRING_SQLQUERY)"
-}
-
-request_sql_geombyid()
-{
- local PARAMETER_STRING_ID="$1"
-
- local LOCAL_ROWSTING_RESULT
-
- LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
-copy (
- select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
- where \"$CONFIG_MAPIMAGE_WFSIDFIELD\" = '$PARAMETER_STRING_ID'
- limit 1
-)
-to stdout with delimiter as E'\t' null as ''"
- )
-
- echo "$LOCAL_ROWSTRING_RESULT"
-}
-
-request_sql_geombyotherid()
-{
- local PARAMETER_STRING_OTHERID="$1"
-
- local LOCAL_ROWSTRING_RESULT
-
- LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
-copy (
- select min(st_xmin(\"geom\")), min(st_ymin(\"geom\")), max(st_xmax(\"geom\")), max(st_ymax(\"geom\"))
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
- where \"$CONFIG_MAPIMAGE_WFSOTHERIDFIELD\" = '$PARAMETER_STRING_OTHERID'
-)
-to stdout with delimiter as E'\t' null as ''"
-)
-
- echo "$LOCAL_ROWSTRING_RESULT"
-}

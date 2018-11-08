@@ -20,51 +20,32 @@ $CONFIG_MAP_CSS
 
 ### HTML GET id & gid ###
 
-SHELL_GET_ID=$(shell_get_value "id")
-SHELL_GET_GID=$(shell_get_value "otherid")
+SHELLGET_STRING_IDS=$(shell_get_value "ids")
 
-GLOBAL_INTEGER_LEFTX=$CONFIG_WMS_DEFAULTLEFTX
-GLOBAL_INTEGER_BOTTOMY=$CONFIG_WMS_DEFAULTBOTTOMY
-
-SHELLGET_INTEGER_ZOOMLEVEL=$CONFIG_WMS_DEFAULTZOOMLEVEL
+GLOBAL_INTEGER_CENTERX=$CONFIG_WMS_DEFAULTCENTERX
+GLOBAL_INTEGER_CENTERY=$CONFIG_WMS_DEFAULTCENTERY;
+GLOBAL_INTEGER_ZOOMLEVEL=$CONFIG_WMS_DEFAULTZOOMLEVEL
 
 
-GLOBAL_STRING_GEOMARRAY=""
-
-if [ ! -z "$SHELL_GET_ID" ]
+if [ ! -z "$SHELLGET_STRING_IDS" ]
 then
- GLOBAL_STRING_GEOMARRAY=$(get_geomarray_featureid "$SHELL_GET_ID")
-fi
-
-if [ ! -z "$SHELL_GET_GID" ]
-then
- GLOBAL_STRING_GEOMARRAY=$(get_geomarray_featuregroupid "$SHELL_GET_GID")
-fi
-
-if [ ! -z "$GLOBAL_STRING_GEOMARRAY" ]
-then
- IFS=' '
- GLOBAL_ARRAY_MAPBOX=( $(convert_mapbox_geomarray "$GLOBAL_STRING_GEOMARRAY") )
-
- if [ -z "${GLOBAL_ARRAY_MAPBOX[*]}" ]
+ if [ "$(check_value_integersstring "$SHELLGET_STRING_IDS")" = true ]
  then
-  SHELL_GET_ID=""
- else
-  GLOBAL_CENTERX="${GLOBAL_ARRAY_MAPBOX[0]}"
-  GLOBAL_CENTERY="${GLOBAL_ARRAY_MAPBOX[1]}"
-  SHELLGET_INTEGER_ZOOMLEVEL="${GLOBAL_ARRAY_MAPBOX[2]}"
+echo "<!-- OK -->"
+  GLOBAL_STRING_GEOM=$(request_sql_geombyids "$SHELL_GET_IDS")
+
+  if [ ! -z "$GLOBAL_STRING_GEOM" ]
+  then
+   IFS=' '
+   GLOBAL_ARRAY_GEOM=( $GLOBAL_STRING_GEOM )
+
+   GLOBAL_INTEGER_CENTERX=$(( ${GLOBAL_ARRAY_GEOM[2]} - ${GLOBAL_ARRAY_GEOM[0]} ))
+   GLOBAL_INTEGER_CENTERY=$(( ${GLOBAL_ARRAY_GEOM[3]} - ${GLOBAL_ARRAY_GEOM[1]} ))
+
+   GLOBAL_INTEGER_ZOOMLEVEL=$(convert_geomarray_zoomlevel "$GLOBAL_ARRAY_STRING")
+  fi
  fi
 fi
-
-if [ -z "$SHELL_GET_ID" ]
-then
- GLOBAL_CENTERX="$CONFIG_WMS_DEFAULTCENTERX"
- GLOBAL_CENTERY="$CONFIG_WMS_DEFAULTCENTERY"
- GLOBAL_ZOOMLEVEL="$CONFIG_WMS_DEFAULTZOOMLEVEL"
-fi
-
-GLOBAL_INTEGER_LEFTX=583100;
-GLOBAL_INTEGER_BOTTOMY=75700;
 
 ### HTML tags: mapimage, map help and map legend ###
 
@@ -103,10 +84,10 @@ var global_integer_maximumx=$CONFIG_WMS_MAXIMUMX;
 var global_integer_minimumy=$CONFIG_WMS_MINIMUMY;
 var global_integer_maximumy=$CONFIG_WMS_MAXIMUMY;
 
-var global_integer_centerx=$CONFIG_WMS_DEFAULTCENTERX;
-var global_integer_centery=$CONFIG_WMS_DEFAULTCENTERY;
+var global_integer_centerx=$GLOBAL_INTEGER_CENTERX;
+var global_integer_centery=$GLOBAL_INTEGER_CENTERY;
 
-var global_integer_zoomlevel=$SHELLGET_INTEGER_ZOOMLEVEL;
+var global_integer_zoomlevel=$GLOBAL_INTEGER_ZOOMLEVEL;
 var global_integer_zoomlevelminimum=$CONFIG_WMS_ZOOMLEVELMINIMUM;
 var global_integer_zoomlevelmaximum=$CONFIG_WMS_ZOOMLEVELMAXIMUM;
 
@@ -123,8 +104,8 @@ if (document.getElementById('mapimage').width < global_integer_imagefullwidth)
 echo "
 // ### HTML script: set variables from HTML GET ###
 
-var global_integer_leftx=$GLOBAL_INTEGER_LEFTX;
-var global_integer_bottomy=$GLOBAL_INTEGER_BOTTOMY;"
+var global_integer_leftx;
+var global_integer_bottomy;"
 
 ### HTML script: calculate variables ###
 

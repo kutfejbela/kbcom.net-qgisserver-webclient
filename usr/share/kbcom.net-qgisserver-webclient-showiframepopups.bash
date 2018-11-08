@@ -34,10 +34,10 @@ function popupiframes_hide()
 </script>
 "
 
-### SEARCHRESULT setposition & onload ###
+### SEARCHRESULT hide, setposition, setsrc & onload ###
 
 echo "
-<!-- SEARCHRESULT hide, setposition & onload -->
+<!-- SEARCHRESULT hide, setposition, setsrc & onload -->
 
 <script>
 
@@ -94,10 +94,10 @@ function iframe_searchresult_onload()
 </script>
 "
 
-### MAPTIP setposition & onload  ###
+### MAPTIP setposition, setsrc & onload  ###
 
 echo "
-<!-- MAPTIP setposition & onload -->
+<!-- MAPTIP setposition, setsrc & onload -->
 
 <script>
 

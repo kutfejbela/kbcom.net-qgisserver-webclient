@@ -20,13 +20,12 @@ $CONFIG_SEARCHRESULT_CSS
 
 ### GET searchtext ###
 
-SHELL_GET_SEARCHTEXT=$(shell_get_value "searchtext")
+SHELLGET_STRING_SEARCHTEXT=$(shell_get_value "searchtext")
 
 # WFS search cannot sort and cannot handle non-ascii characters
 #GLOBAL_DBSTRING_SEARCHRESULT=$(request_wfs_searchresult "$SHELL_GET_SEARCHTEXT" | sort )
 
-GLOBAL_STRING_SQLLIKE=$(convert_spaceseparetedstring_sqllikestring "$SHELL_GET_SEARCHTEXT")
-GLOBAL_DBSTRING_SEARCHRESULT=$(request_sql_searchresult "$GLOBAL_STRING_SQLLIKE")
+GLOBAL_DBSTRING_SEARCHRESULT=$(request_sql_searchresult "$SHELLGET_STRING_SEARCHTEXT")
 
 GLOBAL_DBSTRING_SEARCHRESULT
 
@@ -58,8 +57,7 @@ $GLOBAL_STRING_HTMLOUTPUT
 
   GLOBAL_STRING_HTMLOUTPUT+="
 <p class='searchresult-item'
- onclick='parent.document.getElementById(\"map\").src=\"$GLOBAL_URL?type=showmap&id=${GLOBAL_ARRAY_SEARCHRESULT[0]}\";
- parent.document.getElementById(\"search_result\").style.visible=\"hidden\";'>"
+ onclick='parent.popupiframes_hide(); parent.iframe_map_setsrc(\"${GLOBAL_ARRAY_SEARCHRESULT[0]}\");'>"
   GLOBAL_STRING_HTMLOUTPUT+=$(convert_escapedstring_html "${GLOBAL_ARRAY_SEARCHRESULT[1]/\\\//\/}")
   GLOBAL_STRING_HTMLOUTPUT+="</p>"
  done
