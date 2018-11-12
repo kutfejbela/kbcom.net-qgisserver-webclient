@@ -1,7 +1,11 @@
 #!/bin/bash
 
 GLOBAL_FOLDER_SCRIPT=$(/usr/bin/dirname "$0")
-source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient.bash"
+source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient-check.bash"
+source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient-convert.bash"
+source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient-request.bash"
+source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient-shell.bash"
+source "$GLOBAL_FOLDER_SCRIPT/.kbcom.net-qgisserver-webclient-wfssql.bash"
 
 source $CONFIG_FOLDER_MAIN/etc/kbcom.net-qgisserver-webclient.conf
 
@@ -23,6 +27,9 @@ maptip)
 # show_header_html
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-maptip.bash"
 # show_footer_html
+ ;;
+mapbbox)
+ source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-mapbbox.bash"
  ;;
 map)
  source "$GLOBAL_FOLDER_SCRIPT/kbcom.net-qgisserver-webclient-map.bash"

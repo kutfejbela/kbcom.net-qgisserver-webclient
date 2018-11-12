@@ -56,7 +56,7 @@ shell_url()
  echo $LOCAL_URL
 }
 
-check_value_positveinteger()
+check_value_positiveinteger()
 {
  local PARAMETER_STRING_INTEGERVALUE="$1"
 
@@ -148,7 +148,7 @@ check_value_integersstring()
 
  for LOCAL_INTEGER_VALUE in $PARAMETER_STRING_INTEGERS
  do
-  if [ "$(check_value_positveinteger "$LOCAL_INTEGER_VALUE")" = false ]
+  if [ "$(check_value_positiveinteger "$LOCAL_INTEGER_VALUE")" = false ]
   then
    echo false
    return
@@ -285,11 +285,47 @@ convert_real_integer()
  fi
 }
 
-convert_bbox_zoomlevel()
+convert_bboxstring_zoomlevel()
 {
  local PARAMETER_STRING_BBOX="$1"
 
- echo "1"
+ local LOCAL_ARRAY_BBOX
+ local LOCAL_INTEGER_WIDTH
+ local LOCAL_INTEGER_HEIGHT
+ local LOCAL_INTEGER_WIDTHMAXIMUM
+ local LOCAL_INTEGER_HEIGHTMAXIMUM
+ local LOCAL_INTEGER_ZOOMLEVEL
+ local LOCAL_INTEGER_ZOOMDIVIDE
+ local LOCAL_INTEGER_ZOOMWIDTH
+ local LOCAL_INTEGER_ZOOMHEIGHT
+
+ IFS=' '
+ LOCAL_ARRAY_BBOX=( $PARAMETER_STRING_BBOX )
+
+ LOCAL_INTEGER_WIDTH=$(( $LOCAL_ARRAY_BBOX{[2]} - $LOCAL_ARRAY_BBOX{[0]} ))
+ LOCAL_INTEGER_HEIGHT=$(( $LOCAL_ARRAY_BBOX{[3]} - $LOCAL_ARRAY_BBOX{[1]} ))
+
+ LOCAL_INTEGER_WIDTHMAXIMUM=$(($CONFIG_WMS_MAXIMUMX - $CONFIG_WMS_MINIMUMX))
+ LOCAL_INTEGER_HEIGHTMAXIMUM=$(($CONFIG_WMS_MAXIMUMY - $CONFIG_WMS_MINIMUMY))
+
+ for(( LOCAL_INTEGER_ZOOMLEVEL=CONFIG_WMS_ZOOMLEVELMINIMUM; LOCAL_INTEGER_ZOOMLEVEL<=CONFIG_WMS_ZOOMLEVELMAXIMUM; LOCAL_INTEGER_ZOOMLEVEL++ ))
+ do
+  LOCAL_INTEGER_ZOOMDIVIDE=$(( ($LOCAL_INTEGER_ZOOMLEVEL * $CONFIG_WMS_ZOOMLEVELSTEP) ** 2 ))
+
+  LOCAL_INTEGER_ZOOMWIDTH=$(( $LOCAL_INTEGER_WIDTHMAXIMUM / $LOCAL_INTEGER_ZOOMDIVIDE ))
+  LOCAL_INTEGER_ZOOMHEIGHT=$(( $LOCAL_INTEGER_HEIGHTMAXIMUM / $LOCAL_INTEGER_ZOOMDIVIDE ))
+
+  if [ "$LOCAL_INTEGER_WIDTH" -lt "$LOCAL_INTEGER_WIDTHMAXIMUM" ]
+  then
+   if [ "$LOCAL_INTEGER_HEIGHT" -lt "$LOCAL_INTEGER_HEIGHTMAXIMUM" ]
+   then
+    echo "$LOCAL_INTEGER_ZOOMLEVEL"
+    return
+   fi
+  fi
+ done
+
+ echo "$LOCAL_INTEGER_ZOOMLEVEL"
 }
 
 convert_widthzoomxy_bbox()
@@ -437,7 +473,7 @@ request_sql_searchresult()
  echo "$(eval $LOCAL_STRING_SQLQUERY)"
 }
 
-request_sql_geombyid()
+request_sql_bboxbyids()
 {
  local PARAMETER_STRING_IDS="$1"
 

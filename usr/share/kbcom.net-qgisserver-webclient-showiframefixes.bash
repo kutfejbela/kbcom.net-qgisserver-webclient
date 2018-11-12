@@ -52,19 +52,14 @@ echo "
 "
 
 
-### MAP setsrc & onload ###
+### MAP onload ###
 
 echo "
-<!-- MAP setsrc & onload -->
+<!-- MAP onload -->
 
 <script>
 
 var global_iframe_map_sized=false;
-
-function iframe_map_setsrc(parameter_string_ids)
-{
- document.getElementById('iframe_map').src='$GLOBAL_URL?module=map&ids=' + parameter_string_ids;
-}
 
 function iframe_map_onload()
 {

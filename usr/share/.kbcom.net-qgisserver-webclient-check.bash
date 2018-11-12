@@ -1,0 +1,103 @@
+#!/bin/bash
+
+check_value_positiveinteger()
+{
+ local PARAMETER_STRING_INTEGERVALUE="$1"
+
+ if [ ! -z "${PARAMETER_STRING_INTEGERVALUE//[0-9]}" ]
+ then
+  echo false
+  return
+ fi
+
+ echo true
+}
+
+check_value_integerbetween()
+{
+ local PARAMETER_STRING_INTEGERVALUE="$1"
+ local PARAMETER_INTEGER_BETWEEN1="$2"
+ local PARAMETER_INTEGER_BETWEEN2="$3"
+
+ local LOCAL_STRING_INTEGERPOSITIVEVALUE
+
+
+ if [ -z "$PARAMETER_STRING_INTEGERVALUE" ]
+ then
+  echo false
+ fi
+
+ LOCAL_STRING_INTEGERPOSITIVEVALUE=${PARAMETER_STRING_INTEGERVALUE#-}
+
+ if [ ! -z "${LOCAL_STRING_INTEGERPOSITIVEVALUE//[0-9]}" ]
+ then
+  echo false
+ fi
+
+ if [ "$PARAMETER_INTEGER_BETWEEN1" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN2" ]
+ then
+  echo true
+ fi
+
+ if [ "$PARAMETER_INTEGER_BETWEEN2" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN1" ]
+ then
+  echo true
+ fi
+
+ echo false
+}
+
+check_value_integerbetweendefault()
+{
+ local PARAMETER_STRING_INTEGERVALUE="$1"
+ local PARAMETER_INTEGER_BETWEEN1="$2"
+ local PARAMETER_INTEGER_BETWEEN2="$3"
+ local PARAMETER_INTEGER_DEFAULT="$4"
+
+ local LOCAL_STRING_INTEGERPOSITIVEVALUE
+
+
+ if [ -z "$PARAMETER_STRING_INTEGERVALUE" ]
+ then
+  echo "$PARAMETER_INTEGER_DEFAULT"
+  return
+ fi
+
+ LOCAL_STRING_INTEGERPOSITIVEVALUE=${PARAMETER_STRING_INTEGERVALUE#-}
+
+ if [ ! -z "${LOCAL_STRING_INTEGERPOSITIVEVALUE//[0-9]}" ]
+ then
+  echo "$PARAMETER_INTEGER_DEFAULT"
+  return
+ fi
+
+ if [ "$PARAMETER_INTEGER_BETWEEN1" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN2" ]
+ then
+  echo "$PARAMETER_STRING_INTEGERVALUE"
+  return
+ fi
+
+ if [ "$PARAMETER_INTEGER_BETWEEN2" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN1" ]
+ then
+  echo "$PARAMETER_STRING_INTEGERVALUE"
+  return
+ fi
+
+ echo "$PARAMETER_INTEGER_DEFAULT"
+}
+
+check_value_integersstring()
+{
+ local PARAMETER_STRING_INTEGERS="$1"
+
+ for LOCAL_INTEGER_VALUE in $PARAMETER_STRING_INTEGERS
+ do
+  if [ "$(check_value_positiveinteger "$LOCAL_INTEGER_VALUE")" = false ]
+  then
+   echo false
+   return
+  fi
+ done
+
+ echo true
+}

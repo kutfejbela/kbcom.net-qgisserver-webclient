@@ -18,35 +18,6 @@ $CONFIG_MAP_CSS
 <body tabindex='-1' onclick='parent.popupiframes_hide();'>
 "
 
-### HTML GET id & gid ###
-
-SHELLGET_STRING_IDS=$(shell_get_value "ids")
-
-GLOBAL_INTEGER_CENTERX=$CONFIG_WMS_DEFAULTCENTERX
-GLOBAL_INTEGER_CENTERY=$CONFIG_WMS_DEFAULTCENTERY;
-GLOBAL_INTEGER_ZOOMLEVEL=$CONFIG_WMS_DEFAULTZOOMLEVEL
-
-
-if [ ! -z "$SHELLGET_STRING_IDS" ]
-then
- if [ "$(check_value_integersstring "$SHELLGET_STRING_IDS")" = true ]
- then
-echo "<!-- OK -->"
-  GLOBAL_STRING_GEOM=$(request_sql_geombyids "$SHELL_GET_IDS")
-
-  if [ ! -z "$GLOBAL_STRING_GEOM" ]
-  then
-   IFS=' '
-   GLOBAL_ARRAY_GEOM=( $GLOBAL_STRING_GEOM )
-
-   GLOBAL_INTEGER_CENTERX=$(( ${GLOBAL_ARRAY_GEOM[2]} - ${GLOBAL_ARRAY_GEOM[0]} ))
-   GLOBAL_INTEGER_CENTERY=$(( ${GLOBAL_ARRAY_GEOM[3]} - ${GLOBAL_ARRAY_GEOM[1]} ))
-
-   GLOBAL_INTEGER_ZOOMLEVEL=$(convert_geomarray_zoomlevel "$GLOBAL_ARRAY_STRING")
-  fi
- fi
-fi
-
 ### HTML tags: mapimage, map help and map legend ###
 
 echo "
@@ -84,10 +55,10 @@ var global_integer_maximumx=$CONFIG_WMS_MAXIMUMX;
 var global_integer_minimumy=$CONFIG_WMS_MINIMUMY;
 var global_integer_maximumy=$CONFIG_WMS_MAXIMUMY;
 
-var global_integer_centerx=$GLOBAL_INTEGER_CENTERX;
-var global_integer_centery=$GLOBAL_INTEGER_CENTERY;
+var global_integer_centerx=$CONFIG_WMS_DEFAULTCENTERX;
+var global_integer_centery=$CONFIG_WMS_DEFAULTCENTERY;
 
-var global_integer_zoomlevel=$GLOBAL_INTEGER_ZOOMLEVEL;
+var global_integer_zoomlevel=$CONFIG_WMS_DEFAULTZOOMLEVEL;
 var global_integer_zoomlevelminimum=$CONFIG_WMS_ZOOMLEVELMINIMUM;
 var global_integer_zoomlevelmaximum=$CONFIG_WMS_ZOOMLEVELMAXIMUM;
 
@@ -167,6 +138,24 @@ mapimage_calculatemove();
 
 global_boolean_doresize=true;
 mapimage_setsrc();
+
+function mapimage_setcoordinates(parameter_integer_centerx, parameter_integer_centery, parameter_integer_width, parameter_integer_height)
+{
+ alert(parameter_integer_centerx + ':' + parameter_integer_centery + ':' + parameter_integer_width + ':' + parameter_integer_height);
+
+ global_integer_centerx=parameter_integer_centerx;
+ global_integer_centery=parameter_integer_centery;
+
+ global_integer_zoomlevel=10;
+
+ mapimage_calculatehorizontal();
+ mapimage_calculatevertical();
+
+ mapimage_calculatemove();
+
+ global_boolean_doresize=true;
+ mapimage_setsrc();
+}
 
 function mapimage_checkx()
 {

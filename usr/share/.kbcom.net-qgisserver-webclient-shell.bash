@@ -1,0 +1,57 @@
+#!/bin/bash
+
+shell_exit()
+{
+ echo "Content-type: text/html;charset=UTF-8"
+ echo
+ exit
+}
+
+shell_get_value()
+{
+ local PARAMETER_PATTERN_VARIABLENAME="$1"
+
+ local LOCAL_PATTERN_VARIABLENAME
+ local LOCAL_STRING_RESULT
+
+ if [ -z "$QUERY_STRING" ]
+ then
+  return
+ fi
+
+ if [ "${QUERY_STRING:0:${#PARAMETER_PATTERN_VARIABLENAME}}" = "$PARAMETER_PATTERN_VARIABLENAME" ]
+ then
+  LOCAL_STRING_RESULT="${QUERY_STRING:${#PARAMETER_PATTERN_VARIABLENAME} + 1}"
+ else
+  LOCAL_PATTERN_VARIABLENAME="*&$PARAMETER_PATTERN_VARIABLENAME="
+
+  LOCAL_STRING_RESULT="${QUERY_STRING#$LOCAL_PATTERN_VARIABLENAME}"
+
+  if [ "$LOCAL_STRING_RESULT" = "$QUERY_STRING" ]
+  then
+   return
+  fi
+ fi
+
+ LOCAL_STRING_RESULT="${LOCAL_STRING_RESULT%%&*}"
+ LOCAL_STRING_RESULT="${LOCAL_STRING_RESULT//\\/\\\\}"
+ LOCAL_STRING_RESULT="${LOCAL_STRING_RESULT//%/\\x}"
+
+ echo -e "$LOCAL_STRING_RESULT"
+}
+
+shell_url()
+{
+ local LOCAL_URL=""
+
+ if [ "$HTTPS" == "on" ]
+ then
+  LOCAL_URL="https://"
+ else
+  LOCAL_URL="http://"
+ fi
+
+ LOCAL_URL+="${SERVER_NAME}:${SERVER_PORT}${REQUEST_URI%\?*}"
+
+ echo $LOCAL_URL
+}
