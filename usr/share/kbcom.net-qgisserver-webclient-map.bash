@@ -59,6 +59,7 @@ var global_integer_centerx=$CONFIG_WMS_DEFAULTCENTERX;
 var global_integer_centery=$CONFIG_WMS_DEFAULTCENTERY;
 
 var global_integer_zoomlevel=$CONFIG_WMS_DEFAULTZOOMLEVEL;
+var global_integer_zoomlevelstep=$CONFIG_WMS_ZOOMLEVELSTEP;
 var global_integer_zoomlevelminimum=$CONFIG_WMS_ZOOMLEVELMINIMUM;
 var global_integer_zoomlevelmaximum=$CONFIG_WMS_ZOOMLEVELMAXIMUM;
 
@@ -87,7 +88,7 @@ var global_integer_maximumwidth=global_integer_maximumx - global_integer_minimum
 var global_integer_maximumheight=global_integer_maximumy - global_integer_minimumy;
 var global_integer_fullwidth=Math.round((global_integer_imagefullwidth / global_integer_imagemaximumwidth) * global_integer_maximumwidth);
 
-var global_real_zoomlevelstepsquare=Math.pow($CONFIG_WMS_ZOOMLEVELSTEP, 2);
+var global_real_zoomlevelstepsquare=Math.pow(global_integer_zoomlevelstep, 2);
 var global_real_movepercentage=$CONFIG_WMS_MOVEPERCENTAGE/100;"
 
 ### HTML script: other variables ###
@@ -141,12 +142,52 @@ mapimage_setsrc();
 
 function mapimage_setcoordinates(parameter_integer_centerx, parameter_integer_centery, parameter_integer_width, parameter_integer_height)
 {
- alert(parameter_integer_centerx + ':' + parameter_integer_centery + ':' + parameter_integer_width + ':' + parameter_integer_height);
+ var local_boolean_zoomlevel;
+ var local_integer_zoomlevel;
+ var local_integer_zoomheight;
+ var local_integer_imagemaximumwidth;
+ var local_integer_maximumzoomwidth;
+ var local_integer_zoomwidth;
 
  global_integer_centerx=parameter_integer_centerx;
  global_integer_centery=parameter_integer_centery;
 
- global_integer_zoomlevel=10;
+ local_boolean_zoomlevel=false;
+
+ for(local_integer_zoomlevel=global_integer_zoomlevelmaximum; local_integer_zoomlevel > global_integer_zoomlevelminimum; local_integer_zoomlevel-=global_integer_zoomlevelstep)
+ {
+  local_integer_zoomheight=Math.round(global_integer_maximumheight / (Math.pow(local_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare));
+
+  if (parameter_integer_height <= local_integer_zoomheight)
+  {
+   local_integer_imagemaximumwidth=Math.round(global_integer_imagemaximumwidth * Math.pow(local_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare);
+
+   if (local_integer_imagemaximumwidth <= global_integer_imagefullwidth)
+   {
+    local_integer_zoomwidth=global_integer_maximumwidth;
+   }
+   else
+   {
+    local_integer_maximumzoomwidth=Math.round(global_integer_maximumwidth / (Math.pow(local_integer_zoomlevel, 2) * global_real_zoomlevelstepsquare));
+    local_integer_zoomwidth=Math.round((global_integer_imagefullwidth / global_integer_imagemaximumwidth) * local_integer_maximumzoomwidth);
+   }
+
+   if (parameter_integer_width <= local_integer_zoomwidth)
+   {
+    local_boolean_zoomlevel=true;
+    break;
+   }
+  }
+ }
+
+ if (local_boolean_zoomlevel)
+ {
+  global_integer_zoomlevel=local_integer_zoomlevel;
+ }
+ else
+ {
+  global_integer_zoomlevel=global_integer_zoomlevelminimum;
+ }
 
  mapimage_calculatehorizontal();
  mapimage_calculatevertical();

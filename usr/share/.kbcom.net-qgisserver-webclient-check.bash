@@ -25,6 +25,7 @@ check_value_integerbetween()
  if [ -z "$PARAMETER_STRING_INTEGERVALUE" ]
  then
   echo false
+  return
  fi
 
  LOCAL_STRING_INTEGERPOSITIVEVALUE=${PARAMETER_STRING_INTEGERVALUE#-}
@@ -32,16 +33,19 @@ check_value_integerbetween()
  if [ ! -z "${LOCAL_STRING_INTEGERPOSITIVEVALUE//[0-9]}" ]
  then
   echo false
+  return
  fi
 
  if [ "$PARAMETER_INTEGER_BETWEEN1" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN2" ]
  then
   echo true
+  return
  fi
 
  if [ "$PARAMETER_INTEGER_BETWEEN2" -le "$PARAMETER_STRING_INTEGERVALUE" ] && [ "$PARAMETER_STRING_INTEGERVALUE" -le "$PARAMETER_INTEGER_BETWEEN1" ]
  then
   echo true
+  return
  fi
 
  echo false

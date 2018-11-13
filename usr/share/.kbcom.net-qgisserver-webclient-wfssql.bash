@@ -42,7 +42,7 @@ request_sql_searchresult()
  LOCAL_STRING_SQLQUERY="/usr/bin/psql -c \"
   copy (
    select \\\"$CONFIG_SEARCHRESULT_WFSIDFIELD\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
-   from \\\"$CONFIG_SEARCHRESULT_WFSLAYER\\\"
+   from \\\"$CONFIG_MAPIMAGE_WFSLAYER\\\"
    where \\\"cim\\\" ilike '%$LOCAL_STRING_SQLLIKE%'
    order by \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
   )
