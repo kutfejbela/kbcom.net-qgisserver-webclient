@@ -24,8 +24,8 @@ convert_spaceseparetedstring_sqlwherestring()
 
  local LOCAL_STRING_RESULT
 
- LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING// / OR id=}
- LOCAL_STRING_RESULT="id=$LOCAL_STRING_RESULT"
+ LOCAL_STRING_RESULT=${PARAMETER_STRING_STRING//\ /\'\ OR\ \"id\"=\'}
+ LOCAL_STRING_RESULT="\"id\"='$LOCAL_STRING_RESULT'"
 
  echo "$LOCAL_STRING_RESULT"
 }
@@ -63,7 +63,7 @@ request_sql_bboxbyids()
 
  LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
 copy (
- select st_xmin(\"geom\"), st_ymin(\"geom\"), st_xmax(\"geom\"), st_ymax(\"geom\")
+ select st_xmin(st_union(\"geom\")), st_ymin(st_union(\"geom\")), st_xmax(st_union(\"geom\")), st_ymax(st_union(\"geom\"))
  from \"$CONFIG_MAPIMAGE_WFSLAYER\"
  where $LOCAL_STRING_SQLWHERE
 )

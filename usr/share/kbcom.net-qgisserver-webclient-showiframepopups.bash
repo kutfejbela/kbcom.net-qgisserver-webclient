@@ -147,6 +147,11 @@ function iframe_mapbbox_onload()
 
  local_string_content=document.getElementById('iframe_mapbbox').contentWindow.document.body.innerHTML;
 
+ if (local_string_content == '')
+ {
+  return;
+ }
+
  local_array_bbox=local_string_content.split(',');
 
  local_integer_width=local_array_bbox[2]- local_array_bbox[0];
