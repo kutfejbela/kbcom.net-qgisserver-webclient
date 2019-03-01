@@ -9,6 +9,7 @@ echo "
 <!-- MAIN head & style classes -->
 <html>
 <head>
+<meta http-equiv='X-UA-Compatible' content='IE=edge'></meta>
 <title>$CONFIG_MAIN_TITLE</title>
 <style>
 div.maincontainer { position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: 0; padding: 0; border: 0; }

@@ -42,14 +42,15 @@ echo "
 
 ### HTML script: set variables from config ###
 
+#echo "
+#// ### HTML script: set variables from config ###
+
+#document.getElementById('mapimage').addEventListener('wheel', function(){
+# mapimage_onwheel(this, event);
+# event.preventDefault();
+#});
+
 echo "
-// ### HTML script: set variables from config ###
-
-document.getElementById('mapimage').addEventListener('wheel', function(){
- mapimage_onwheel(this, event);
- event.preventDefault();
-});
-
 var global_integer_minimumx=$CONFIG_WMS_MINIMUMX;
 var global_integer_maximumx=$CONFIG_WMS_MAXIMUMX;
 var global_integer_minimumy=$CONFIG_WMS_MINIMUMY;
