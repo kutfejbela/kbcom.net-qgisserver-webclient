@@ -96,12 +96,19 @@ function iframe_searchresult_onload()
 </script>
 "
 
-### MAPTIP setposition, setsrc & onload  ###
+### MAPTIP hide, setposition, setsrc & onload  ###
 
 echo "
-<!-- MAPTIP setposition, setsrc & onload -->
+<!-- MAPTIP hide, setposition, setsrc & onload -->
 
 <script>
+
+function iframe_maptip_hide()
+{
+ document.getElementById('iframe_maptip').style.width=0;
+ document.getElementById('iframe_maptip').style.height=0;
+ document.getElementById('iframe_maptip').style.visibility='hidden';
+}
 
 function iframe_maptip_setposition(parameter_integer_x, parameter_integer_y)
 {
@@ -116,6 +123,12 @@ function iframe_maptip_setsrc(parameter_integer_imagewidth, parameter_integer_zo
 
 function iframe_maptip_onload()
 {
+ if (document.getElementById('iframe_maptip').contentWindow.document.body.innerHTML == '')
+ {
+  iframe_maptip_hide();
+  return;
+ }
+
  document.getElementById('iframe_maptip').style.width=document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
  document.getElementById('iframe_maptip').style.height=document.getElementById('iframe_maptip').contentWindow.document.body.scrollHeight;
  document.getElementById('iframe_maptip').style.visibility='visible';
