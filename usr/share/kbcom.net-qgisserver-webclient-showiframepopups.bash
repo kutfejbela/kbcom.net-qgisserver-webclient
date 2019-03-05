@@ -123,13 +123,33 @@ function iframe_maptip_setsrc(parameter_integer_imagewidth, parameter_integer_zo
 
 function iframe_maptip_onload()
 {
+ var local_integer_iframemapwidth;
+ var local_integer_iframemaptipwidth;
+
  if (document.getElementById('iframe_maptip').contentWindow.document.body.innerHTML == '')
  {
   iframe_maptip_hide();
-  return;
+//  return;
  }
 
- document.getElementById('iframe_maptip').style.width=document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
+ local_integer_iframemapwidth=document.getElementById('iframe_map').contentWindow.document.body.scrollWidth;
+ local_integer_iframemaptipwidth=document.getElementById('iframe_maptip').contentWindow.document.body.scrollWidth;
+
+ if (local_integer_iframemapwidth < local_integer_iframemaptipwidth)
+ {
+  document.getElementById('iframe_maptip').style.left=0;
+  document.getElementById('iframe_maptip').style.width=local_integer_iframemapwidth;
+ }
+ else if (local_integer_iframemapwidth < document.getElementById('iframe_maptip').offsetLeft + local_integer_iframemaptipwidth)
+ {
+  document.getElementById('iframe_maptip').style.left=local_integer_iframemapwidth - local_integer_iframemaptipwidth;
+  document.getElementById('iframe_maptip').style.width=local_integer_iframemapwidth;
+ }
+ else
+ {
+  document.getElementById('iframe_maptip').style.width=local_integer_iframemaptipwidth;
+ }
+
  document.getElementById('iframe_maptip').style.height=document.getElementById('iframe_maptip').contentWindow.document.body.scrollHeight;
  document.getElementById('iframe_maptip').style.visibility='visible';
 }
