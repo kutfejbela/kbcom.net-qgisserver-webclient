@@ -129,7 +129,7 @@ function iframe_maptip_onload()
  if (document.getElementById('iframe_maptip').contentWindow.document.body.innerHTML == '')
  {
   iframe_maptip_hide();
-//  return;
+  return;
  }
 
  local_integer_iframemapwidth=document.getElementById('iframe_map').contentWindow.document.body.scrollWidth;
@@ -140,10 +140,10 @@ function iframe_maptip_onload()
   document.getElementById('iframe_maptip').style.left=0;
   document.getElementById('iframe_maptip').style.width=local_integer_iframemapwidth;
  }
- else if (local_integer_iframemapwidth < document.getElementById('iframe_maptip').offsetLeft + local_integer_iframemaptipwidth)
+ else if (local_integer_iframemapwidth < (document.getElementById('iframe_maptip').offsetLeft + local_integer_iframemaptipwidth))
  {
-  document.getElementById('iframe_maptip').style.left=local_integer_iframemapwidth - local_integer_iframemaptipwidth;
-  document.getElementById('iframe_maptip').style.width=local_integer_iframemapwidth;
+  document.getElementById('iframe_maptip').style.left=local_integer_iframemapwidth - local_integer_iframemaptipwidth - 1;
+  document.getElementById('iframe_maptip').style.width=local_integer_iframemaptipwidth;
  }
  else
  {
