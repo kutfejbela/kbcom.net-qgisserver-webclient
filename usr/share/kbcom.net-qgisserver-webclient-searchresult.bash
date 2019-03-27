@@ -28,7 +28,7 @@ GLOBAL_STRING_HTMLOUTPUT=""
 
 if [ -z "$GLOBAL_DBSTRING_SEARCHRESULT" ]
 then
- GLOBAL_STRING_HTMLOUTPUT="<p class='searchresult-message'>$CONFIG_SEARCHRESULT_NONETEXT</p>"
+ GLOBAL_STRING_HTMLOUTPUT="<p id='focus' tabindex='0' class='searchresult-message'>$CONFIG_SEARCHRESULT_NONETEXT</p>"
 else
  GLOBAL_CONUTER_SEARCHRESULTITEM=0
 
@@ -40,9 +40,9 @@ else
   if [ $GLOBAL_COUNTER_SEARCHRESULTITEM -gt $CONFIG_SEARCHRESULT_MAXIMUMITEMS ]
   then
    GLOBAL_STRING_HTMLOUTPUT="
-<p class='searchresult-message'>$CONFIG_SEARCHRESULT_MORETHANMAXIMUMITEMSTEXT</p>
+<p id='focus' tabindex='0' class='searchresult-message' onkeyup='if (event.which == 40) this.nextElementSibling.focus();'>$CONFIG_SEARCHRESULT_MORETHANMAXIMUMITEMSTEXT</p>
 $GLOBAL_STRING_HTMLOUTPUT
-<p class='searchresult-message'>$CONFIG_SEARCHRESULT_MORETHANMAXIMUMITEMSTEXT</p>"
+<p tabindex='0' class='searchresult-message' onkeyup='if (event.which == 38) this.previousElementSibling.focus();''>$CONFIG_SEARCHRESULT_MORETHANMAXIMUMITEMSTEXT</p>"
    break
   fi
 
@@ -51,8 +51,8 @@ $GLOBAL_STRING_HTMLOUTPUT
   IFS=$'\n'
 
   GLOBAL_STRING_HTMLOUTPUT+="
-<p class='searchresult-item'
- onclick='parent.popupiframes_hide(); parent.iframe_mapbbox_setsrc(\"${GLOBAL_ARRAY_SEARCHRESULT[0]}\");'>"
+<p tabindex='0' class='searchresult-item'
+ onclick='parent.popupiframes_hide(); parent.iframe_mapbbox_setsrc(\"${GLOBAL_ARRAY_SEARCHRESULT[0]}\");' onkeyup='if (event.which == 13) this.onclick(); if (event.which == 40) this.nextElementSibling.focus(); if (event.which == 38) this.previousElementSibling.focus();'>"
   GLOBAL_STRING_HTMLOUTPUT+=$(convert_escapedstring_html "${GLOBAL_ARRAY_SEARCHRESULT[1]/\\\//\/}")
   GLOBAL_STRING_HTMLOUTPUT+="</p>"
  done

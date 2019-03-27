@@ -25,7 +25,7 @@ echo "
 
 <span class='search-title'>$CONFIG_SEARCH_TITLE</span>
 <span class='search-inputboxhelp'>
-<input tabindex='0' type='text' id='search_inputbox' placeholder='$CONFIG_SEARCH_LABELHTMLVALUE' maxlength='30' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);' onfocus='search_inputbox_onkeyup(event);'><br>
+<input tabindex='0' type='text' id='search_inputbox' placeholder='$CONFIG_SEARCH_LABELHTMLVALUE' maxlength='$CONFIG_SEARCH_MAXIMUMCHARACTER' class='search-inputbox' onkeyup='search_inputbox_onkeyup(event);' onfocus='search_inputbox_onkeyup(event);'><br>
 $CONFIG_SEARCH_HELPHTML
 </span>
 "
@@ -37,14 +37,32 @@ echo "
 
 <script>
 
-function search_inputbox_onkeyup(event)
+function search_inputbox_onkeyup(parameter_object_event)
 {
-  var local_search_inputbox_rect = document.getElementById('search_inputbox').getBoundingClientRect();
-  var local_search_inputbox_text = document.getElementById('search_inputbox').value.trim();
-  var local_search_inputbox_textlength = local_search_inputbox_text.length;
+ var local_search_inputbox_rect;
+ var local_search_inputbox_text = document.getElementById('search_inputbox').value.trim();
+ var local_search_inputbox_textlength = local_search_inputbox_text.length;
 
-  parent.iframe_searchresult_hide();
+ parent.iframe_searchresult_hide();"
 
+if [ -z "$CONFIG_SEARCH_AUTOSEARCH" ]
+then
+echo "
+ if (parameter_object_event.which == 13)
+ {
+  if ( local_search_inputbox_textlength < $CONFIG_SEARCH_MINIMUMCHARACTER )
+  {
+   return false;
+  }
+
+  local_search_inputbox_rect = document.getElementById('search_inputbox').getBoundingClientRect();
+
+  parent.iframe_searchresult_setposition(local_search_inputbox_rect.left, local_search_inputbox_rect.bottom);
+  parent.iframe_searchresult_setsrc(local_search_inputbox_text);
+ }
+"
+else
+echo "
   if ( local_search_inputbox_textlength < 4 )
   {
    return;
@@ -59,10 +77,14 @@ function search_inputbox_onkeyup(event)
   parent.iframe_searchresult_setposition(local_search_inputbox_rect.left, local_search_inputbox_rect.bottom);
   parent.iframe_searchresult_setsrc(local_search_inputbox_text);
 //  parent.document.getElementById('iframe_searchresult').src='${GLOBAL_URL}?type=searchresult&searchtext=' + search_inputbox_text;
- }
-
-</script>"
+"
+fi
 
 echo "
+ return false;
+}
+</script>
+
 </body>
 </html>"
+
