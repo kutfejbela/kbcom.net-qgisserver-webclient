@@ -27,7 +27,9 @@ echo "
  width='100%' height='$CONFIG_WMS_IMAGEHEIGHT'
  style='display: block; margin: 0 auto; padding: 0; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;'
  onload='mapimage_onload();' onkeydown='return mapimage_onkeydown(event);' onkeyup='return mapimage_onkeyup(event);'
- ondragstart='return false;' onwheel='mapimage_onwheel(event); return false;'
+ ondragstart='return false;'"
+# onwheel='mapimage_onwheel(event); return false;'
+echo "
  onmousedown='mapimage_onmousedown(event);' onmousemove='mapimage_onmousemove(event);' onmouseup='mapimage_onmouseup(event);' onmouseleave='mapimage_onmouseleave(event);'
  ><br>
 
@@ -42,15 +44,11 @@ echo "
 
 ### HTML script: set variables from config ###
 
-#echo "
-#// ### HTML script: set variables from config ###
-
-#document.getElementById('mapimage').addEventListener('wheel', function(){
-# mapimage_onwheel(this, event);
-# event.preventDefault();
-#});
-
 echo "
+// ### HTML script: set variables from config ###
+
+document.getElementById('mapimage').addEventListener('wheel', mapimage_onwheel);
+
 var global_integer_minimumx=$CONFIG_WMS_MINIMUMX;
 var global_integer_maximumx=$CONFIG_WMS_MAXIMUMX;
 var global_integer_minimumy=$CONFIG_WMS_MINIMUMY;
@@ -595,12 +593,14 @@ function mapimage_onwheel(parameter_object_event)
 
  if (global_boolean_blockpanzoom)
  {
-  return;
+  parameter_object_event.preventDefault();
+  return false;
  }
 
  if (global_boolean_blockzoom)
  {
-  return;
+  parameter_object_event.preventDefault();
+  return false;
  }
 
  if ( parameter_object_event.wheelDelta )
@@ -623,6 +623,9 @@ function mapimage_onwheel(parameter_object_event)
  {
   mapimage_zoomout();
  }
+
+ parameter_object_event.preventDefault();
+ return false;
 }
 
 function mapimage_onmousedown(parameter_object_event)
