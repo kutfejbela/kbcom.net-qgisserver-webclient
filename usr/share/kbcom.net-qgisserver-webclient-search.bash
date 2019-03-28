@@ -39,33 +39,44 @@ echo "
 
 function search_inputbox_onkeyup(parameter_object_event)
 {
+ var local_search_jumptosearchresult;
  var local_search_inputbox_rect;
- var local_search_inputbox_text = document.getElementById('search_inputbox').value.trim();
- var local_search_inputbox_textlength = local_search_inputbox_text.length;
+ var local_search_inputbox_text=document.getElementById('search_inputbox').value.trim();
+ var local_search_inputbox_textlength=local_search_inputbox_text.length;
 
- parent.iframe_searchresult_hide();"
+ if ( local_search_inputbox_textlength < $CONFIG_SEARCH_MINIMUMCHARACTER )
+ {
+  return false;
+ }"
 
 if [ -z "$CONFIG_SEARCH_AUTOSEARCH" ]
 then
  echo "
+ parent.iframe_searchresult_hide();
+
  if (parameter_object_event.which != 13)
  {
   return false;
  }
 
-"
-fi
-
-echo "
- if ( local_search_inputbox_textlength < $CONFIG_SEARCH_MINIMUMCHARACTER )
+ local_search_jumptosearchresult=true;"
+else
+ echo "
+ if (parameter_object_event.which == 13 || parameter_object_event.which == 40 )
  {
+  parent.iframe_searchresult_focus();
   return false;
  }
 
- local_search_inputbox_rect = document.getElementById('search_inputbox').getBoundingClientRect();
+ parent.iframe_searchresult_hide();
+ local_search_jumptosearchresult=false;"
+fi
+
+echo "
+ local_search_inputbox_rect=document.getElementById('search_inputbox').getBoundingClientRect();
 
  parent.iframe_searchresult_setposition(local_search_inputbox_rect.left, local_search_inputbox_rect.bottom);
- parent.iframe_searchresult_setsrc(local_search_inputbox_text);
+ parent.iframe_searchresult_setsrc(local_search_inputbox_text, local_search_jumptosearchresult);
 
  return false;
 }

@@ -43,11 +43,25 @@ echo "
 
 <script>
 
+var global_bool_jumptosearchresult=false;
+
 function iframe_searchresult_hide()
 {
  document.getElementById('iframe_searchresult').style.width=0;
  document.getElementById('iframe_searchresult').style.height=0;
  document.getElementById('iframe_searchresult').style.visibility='hidden';
+}
+
+function iframe_searchresult_focus()
+{
+ if ( document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice') )
+ {
+  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice').focus();
+ }
+ else
+ {
+  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('first').focus();
+ }
 }
 
 function iframe_searchresult_setposition(parameter_integer_x, parameter_integer_y)
@@ -56,7 +70,7 @@ function iframe_searchresult_setposition(parameter_integer_x, parameter_integer_
  document.getElementById('iframe_searchresult').style.top=document.getElementById('iframe_search').offsetTop + parameter_integer_y;
 }
 
-function iframe_searchresult_setsrc(parameter_string_searchtext)
+function iframe_searchresult_setsrc(parameter_string_searchtext, parameter_bool_jumptosearchresult)
 {
  var local_string_searchtext;
 
@@ -64,6 +78,7 @@ function iframe_searchresult_setsrc(parameter_string_searchtext)
  local_string_searchtext=local_string_searchtext.replace('&','%26');
  local_string_searchtext=local_string_searchtext.replace('\t','%09');
 
+ global_bool_jumptosearchresult=parameter_bool_jumptosearchresult;
  document.getElementById('iframe_searchresult').src='$GLOBAL_URL?module=searchresult&searchtext=' + local_string_searchtext;
 }
 
@@ -91,14 +106,13 @@ function iframe_searchresult_onload()
  }
 
  document.getElementById('iframe_searchresult').style.visibility='visible';
- if ( document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice') )
+
+ if ( global_bool_jumptosearchresult )
  {
-  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice').focus();
+  iframe_searchresult_focus();
  }
- else
- {
-  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('first').focus();
- }
+
+ return false;
 }
 
 </script>
