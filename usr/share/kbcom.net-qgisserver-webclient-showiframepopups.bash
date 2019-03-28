@@ -91,7 +91,14 @@ function iframe_searchresult_onload()
  }
 
  document.getElementById('iframe_searchresult').style.visibility='visible';
- document.getElementById('iframe_searchresult').contentWindow.document.getElementById('focus').focus();
+ if ( document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice') )
+ {
+  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice').focus();
+ }
+ else
+ {
+  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('first').focus();
+ }
 }
 
 </script>
