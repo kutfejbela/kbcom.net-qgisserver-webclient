@@ -39,7 +39,6 @@ echo "
 
 function search_inputbox_onkeyup(parameter_object_event)
 {
- var local_search_jumptosearchresult;
  var local_search_inputbox_rect;
  var local_search_inputbox_text=document.getElementById('search_inputbox').value.trim();
  var local_search_inputbox_textlength=local_search_inputbox_text.length;
@@ -57,26 +56,23 @@ then
  if (parameter_object_event.which != 13)
  {
   return false;
- }
-
- local_search_jumptosearchresult=true;"
+ }"
 else
  echo "
  if (parameter_object_event.which == 13 || parameter_object_event.which == 40 )
  {
-  parent.iframe_searchresult_focus();
+  parent.iframe_searchresult_focusfirstelement();
   return false;
  }
 
- parent.iframe_searchresult_hide();
- local_search_jumptosearchresult=false;"
+ parent.iframe_searchresult_hide();"
 fi
 
 echo "
  local_search_inputbox_rect=document.getElementById('search_inputbox').getBoundingClientRect();
 
  parent.iframe_searchresult_setposition(local_search_inputbox_rect.left, local_search_inputbox_rect.bottom);
- parent.iframe_searchresult_setsrc(local_search_inputbox_text, local_search_jumptosearchresult);
+ parent.iframe_searchresult_setsrc(local_search_inputbox_text);
 
  return false;
 }

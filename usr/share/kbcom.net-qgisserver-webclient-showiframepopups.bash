@@ -36,14 +36,12 @@ function popupiframes_hide()
 </script>
 "
 
-### SEARCHRESULT hide, setposition, setsrc & onload ###
+### SEARCHRESULT hide, focusfirstelement, setposition, setsrc & onload ###
 
 echo "
-<!-- SEARCHRESULT hide, setposition, setsrc & onload -->
+<!-- SEARCHRESULT hide, focusfirstelement, setposition, setsrc & onload -->
 
 <script>
-
-var global_bool_jumptosearchresult=false;
 
 function iframe_searchresult_hide()
 {
@@ -52,8 +50,20 @@ function iframe_searchresult_hide()
  document.getElementById('iframe_searchresult').style.visibility='hidden';
 }
 
-function iframe_searchresult_focus()
-{
+function iframe_searchresult_focusfirstelement()
+{"
+
+if [ ! -z "$CONFIG_SEARCH_AUTOSEARCH" -a ! -z "$CONFIG_SEARCH_AUTOENTER" ]
+then
+echo "
+ if ( ! document.getElementById('iframe_searchresult').contentWindow.document.getElementById('others') )
+ {
+  document.getElementById('iframe_searchresult').contentWindow.document.getElementById('first').onclick();
+  return;
+ }"
+fi
+
+echo "
  if ( document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice') )
  {
   document.getElementById('iframe_searchresult').contentWindow.document.getElementById('notice').focus();
@@ -70,7 +80,7 @@ function iframe_searchresult_setposition(parameter_integer_x, parameter_integer_
  document.getElementById('iframe_searchresult').style.top=document.getElementById('iframe_search').offsetTop + parameter_integer_y;
 }
 
-function iframe_searchresult_setsrc(parameter_string_searchtext, parameter_bool_jumptosearchresult)
+function iframe_searchresult_setsrc(parameter_string_searchtext)
 {
  var local_string_searchtext;
 
@@ -78,7 +88,6 @@ function iframe_searchresult_setsrc(parameter_string_searchtext, parameter_bool_
  local_string_searchtext=local_string_searchtext.replace('&','%26');
  local_string_searchtext=local_string_searchtext.replace('\t','%09');
 
- global_bool_jumptosearchresult=parameter_bool_jumptosearchresult;
  document.getElementById('iframe_searchresult').src='$GLOBAL_URL?module=searchresult&searchtext=' + local_string_searchtext;
 }
 
@@ -105,13 +114,15 @@ function iframe_searchresult_onload()
   document.getElementById('iframe_searchresult').style.height=local_integer_contentheight;
  }
 
- document.getElementById('iframe_searchresult').style.visibility='visible';
+ document.getElementById('iframe_searchresult').style.visibility='visible';"
 
- if ( global_bool_jumptosearchresult )
- {
-  iframe_searchresult_focus();
- }
+if [ -z "$CONFIG_SEARCH_AUTOSEARCH" ]
+then
+echo "
+ iframe_searchresult_focusfirstelement();"
+fi
 
+echo "
  return false;
 }
 
