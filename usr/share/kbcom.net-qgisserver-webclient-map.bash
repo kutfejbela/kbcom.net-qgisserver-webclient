@@ -308,8 +308,8 @@ function mapimage_click(parameter_integer_x, parameter_integer_y)
 
  parent.iframe_maptip_setposition(parameter_integer_x, parameter_integer_y);
 
- local_integer_x=parameter_integer_x - document.getElementById('mapimage').x;
- local_integer_y=parameter_integer_y - document.getElementById('mapimage').y;
+ local_integer_x=parameter_integer_x - document.getElementById('mapimage').offsetLeft;
+ local_integer_y=parameter_integer_y - document.getElementById('mapimage').offsetTop;
 
  parent.iframe_maptip_setsrc(global_integer_imagewidth, global_integer_zoomlevel, global_integer_leftx, global_integer_bottomy, local_integer_x, local_integer_y)
 }
@@ -614,8 +614,8 @@ function mapimage_onwheel(parameter_object_event)
 
  if ( local_integer_wheeldelta >= 0 )
  {
-  local_integer_x=parameter_object_event.clientX - document.getElementById('mapimage').x;
-  local_integer_y=parameter_object_event.clientY - document.getElementById('mapimage').y;
+  local_integer_x=parameter_object_event.clientX - document.getElementById('mapimage').offsetLeft;
+  local_integer_y=parameter_object_event.clientY - document.getElementById('mapimage').offsetTop;
 
   mapimage_zoomincoordinate(local_integer_x, local_integer_y);
  }
