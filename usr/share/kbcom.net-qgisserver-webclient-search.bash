@@ -53,13 +53,13 @@ then
  echo "
  parent.iframe_searchresult_hide();
 
- if (parameter_object_event.which != 13)
+ if ( parameter_object_event.which != 13 )
  {
   return false;
  }"
 else
  echo "
- if (parameter_object_event.which == 13 || parameter_object_event.which == 40 )
+ if ( parameter_object_event.which == 13 || parameter_object_event.which == 40 )
  {
   parent.iframe_searchresult_focusfirstelement();
   return false;
@@ -80,4 +80,3 @@ echo "
 
 </body>
 </html>"
-

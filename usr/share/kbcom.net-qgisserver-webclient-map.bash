@@ -15,7 +15,7 @@ $CONFIG_MAP_CSS
 </style>
 <meta charset='UTF-8'>
 </head>
-<body tabindex='-1' onclick='parent.popupiframes_hide();'>
+<body tabindex='-1' onclick='parent.popupiframes_hide();' onkeyup='if ( event.which == 27 ) parent.popupiframes_hide();'>
 "
 
 ### HTML tags: mapimage, map help and map legend ###
