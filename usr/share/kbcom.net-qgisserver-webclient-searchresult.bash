@@ -63,7 +63,7 @@ $GLOBAL_STRING_HTMLOUTPUT
 
   GLOBAL_STRING_HTMLOUTPUT+="
 <p id='$GLOBAL_STRING_SEARCHRESULTID' tabindex='0' class='searchresult-item'
- onclick='parent.popupiframes_hide(); parent.iframe_mapbbox_setsrc(\"${GLOBAL_ARRAY_SEARCHRESULT[0]}\");'
+ onclick='parent.popupiframes_hide(); parent.iframe_mapbbox_setsrc(0, \"${GLOBAL_ARRAY_SEARCHRESULT[0]}\");'
  onkeyup='if (event.which == 13) this.onclick(); if (event.which == 27) parent.document.getElementById(\"iframe_search\").contentWindow.document.getElementById(\"search_inputbox\").focus(); if (event.which == 40) this.nextElementSibling.focus(); if (event.which == 38) this.previousElementSibling.focus();'>"
   GLOBAL_STRING_HTMLOUTPUT+=$(convert_escapedstring_html "${GLOBAL_ARRAY_SEARCHRESULT[1]/\\\//\/}")
   GLOBAL_STRING_HTMLOUTPUT+="</p>"

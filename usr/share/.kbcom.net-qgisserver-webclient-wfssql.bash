@@ -41,8 +41,8 @@ request_sql_searchresult()
 
  LOCAL_STRING_SQLQUERY="/usr/bin/psql -c \"
   copy (
-   select \\\"$CONFIG_SEARCHRESULT_WFSIDFIELD\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
-   from \\\"$CONFIG_MAPIMAGE_WFSLAYER\\\"
+   select \\\"id\\\", \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
+   from \\\"$CONFIG_SEARCHRESULT_WFSLAYER\\\"
    where \\\"cim\\\" ilike '%$LOCAL_STRING_SQLLIKE%'
    order by \\\"$CONFIG_SEARCHRESULT_WFSSEARCHFIELD\\\"
   )
@@ -54,7 +54,8 @@ request_sql_searchresult()
 
 request_sql_bboxbyids()
 {
- local PARAMETER_STRING_IDS="$1"
+ local PARAMETER_INTEGER_GROUPID="$1"
+ local PARAMETER_STRING_IDS="$2"
 
  local LOCAL_STRING_SQLWHERE
  local LOCAL_ROWSTING_RESULT
@@ -64,7 +65,7 @@ request_sql_bboxbyids()
  LOCAL_ROWSTRING_RESULT=$(/usr/bin/psql -c "
 copy (
  select st_xmin(st_union(\"geom\")), st_ymin(st_union(\"geom\")), st_xmax(st_union(\"geom\")), st_ymax(st_union(\"geom\"))
- from \"$CONFIG_MAPIMAGE_WFSLAYER\"
+ from \"${CONFIG_MAPIMAGE_WFSLAYER[$PARAMETER_INTEGER_GROUPID]}\"
  where $LOCAL_STRING_SQLWHERE
 )
 to stdout with delimiter as E'\t' null as ''"

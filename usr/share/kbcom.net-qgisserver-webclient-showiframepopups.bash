@@ -197,9 +197,9 @@ echo "
 
 <script>
 
-function iframe_mapbbox_setsrc(parameter_string_ids)
+function iframe_mapbbox_setsrc(parameter_integer_groupid, parameter_string_ids)
 {
- document.getElementById('iframe_mapbbox').src='$GLOBAL_URL?module=mapbbox&ids=' + parameter_string_ids;
+ document.getElementById('iframe_mapbbox').src='$GLOBAL_URL?module=mapbbox&groupid=' + parameter_integer_groupid + '&ids=' + parameter_string_ids;
 }
 
 function iframe_mapbbox_onload()
