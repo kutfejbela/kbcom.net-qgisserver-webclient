@@ -91,7 +91,7 @@ convert_datatemplate_string()
 
  LOCAL_INTEGER_COLUMN="${PARAMETER_STRING_DATATEMPLATE:1:2}"
 
- if [ "$(check_value_positiveinteger "$LOCAL_INTEGER_COLUMN")" = false ]
+ if ! check_value_positiveinteger "$LOCAL_INTEGER_COLUMN"
  then
   return
  fi
@@ -142,12 +142,12 @@ convert_stringtemplate_string()
    LOCAL_STRING_RESULT+="$LOCAL_STRING_ADD"
   fi
 
-  if [ "$LOCAL_STRING_ADD" = "$LOCAL_STRING_TEMPLATE" ]
+  LOCAL_STRING_TEMPLATE="${LOCAL_STRING_TEMPLATE:${#LOCAL_STRING_ADD}}"
+
+  if [ -z "$LOCAL_STRING_TEMPLATE" ]
   then
    break
   fi
-
-  LOCAL_STRING_TEMPLATE="${LOCAL_STRING_TEMPLATE:${#LOCAL_STRING_ADD}}"
 
   if [ "${LOCAL_STRING_TEMPLATE:0:2}" = "&:" ]
   then

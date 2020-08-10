@@ -6,11 +6,10 @@ check_value_positiveinteger()
 
  if [ ! -z "${PARAMETER_STRING_INTEGERVALUE//[0-9]}" ]
  then
-  echo false
-  return
+  return 1
  fi
 
- echo true
+ return 0 #OK
 }
 
 check_value_integerbetween()
@@ -96,7 +95,7 @@ check_value_integersstring()
 
  for LOCAL_INTEGER_VALUE in $PARAMETER_STRING_INTEGERS
  do
-  if [ "$(check_value_positiveinteger "$LOCAL_INTEGER_VALUE")" = false ]
+  if ! check_value_positiveinteger "$LOCAL_INTEGER_VALUE"
   then
    echo false
    return

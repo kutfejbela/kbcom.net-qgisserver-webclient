@@ -51,7 +51,7 @@ do
      printf '\n\n<!-- HTML template: data row, index: %s, %s (%(%c)T) -->\n' "$GLOBAL_HTML_INDEX" "$GLOBAL_DATA_INDEX"
 
      IFS=''
-     echo "$(convert_stringtemplate_string "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}" "$GLOBAL_ROWSTRING_DATA")"
+     convert_stringtemplate_string "${CONFIG_HTML_TEMPLATE[$GLOBAL_HTML_INDEX,html_body]}" "$GLOBAL_ROWSTRING_DATA"
     done
    fi
 

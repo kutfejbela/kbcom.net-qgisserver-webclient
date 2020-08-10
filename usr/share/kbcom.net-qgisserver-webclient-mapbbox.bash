@@ -18,7 +18,7 @@ if [ -z "$SHELLGET_STRING_GROUPID" ]
 then
  SHELLGET_STRING_GROUPID=0
 else
- if [ "$(check_value_positiveinteger "$SHELLGET_STRING_IDS")" = false ]
+ if ! check_value_positiveinteger "$SHELLGET_STRING_IDS"
  then
   exit
  fi
